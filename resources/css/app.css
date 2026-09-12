@@ -1,0 +1,271 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Nunito Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-admin-navy: #04346a;
+    --color-admin-navy-dark: #03284f;
+}
+
+.admin-app,
+.admin-auth {
+    font-family: 'Nunito Sans', Roboto, sans-serif;
+}
+
+.admin-login-screen {
+    background-color: #04346a;
+    background-image: url('/images/admin/bg_versity.png');
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+@media (max-width: 640px) {
+    .admin-login-screen {
+        background-attachment: scroll;
+        background-size: cover;
+    }
+}
+
+.admin-table-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.admin-table-board-card {
+    min-height: 5.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    color: #ffffff;
+    box-shadow: 0 8px 16px rgb(4 52 106 / 0.12);
+}
+
+.admin-table-status-available {
+    background-color: #22c55e;
+}
+
+.admin-table-status-occupied {
+    background-color: #5992ee;
+}
+
+.admin-table-status-cleaning {
+    background-color: #b89f1a;
+}
+
+.admin-table-status-legend {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    color: #ffffff;
+}
+
+.orders-table-shell {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid #dbe4ee;
+    border-radius: 0.75rem;
+    overflow: auto;
+}
+
+.orders-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 1100px;
+    width: 100%;
+}
+
+.orders-table thead th {
+    background: #16324f;
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 15px 14px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.orders-table thead th:first-child {
+    border-top-left-radius: 14px;
+}
+
+.orders-table thead th:last-child {
+    border-top-right-radius: 14px;
+}
+
+.orders-table tbody td {
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid #e8eef5;
+    color: #425466;
+    padding: 16px 14px;
+    vertical-align: middle;
+}
+
+.orders-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.orders-table tbody tr:hover td {
+    background: #f7fbff;
+}
+
+.order-id-chip,
+.order-table-chip {
+    background: #f4f7fb;
+    border: 1px solid #dbe4ee;
+    border-radius: 999px;
+    color: #1f2f3e;
+    display: inline-flex;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+
+.order-type-pill {
+    background: rgba(20, 33, 61, 0.07);
+    border-radius: 999px;
+    color: #1f2f3e;
+    display: inline-flex;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 6px 10px;
+    white-space: nowrap;
+}
+
+.order-action-btn {
+    align-items: center;
+    background: rgba(15, 118, 110, 0.08);
+    border: 1px solid rgba(15, 118, 110, 0.2);
+    border-radius: 12px;
+    color: #0f766e;
+    cursor: not-allowed;
+    display: inline-flex;
+    height: 42px;
+    justify-content: center;
+    opacity: 0.65;
+    padding: 0;
+    width: 42px;
+}
+
+.order-action-btn svg {
+    fill: currentColor;
+    height: 18px;
+    width: 18px;
+}
+
+.order-date-text {
+    color: #1f2f3e;
+    font-size: 0.92rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.order-status-pill {
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 7px 12px;
+    white-space: nowrap;
+}
+
+.order-status-pill.is-active {
+    background: rgba(30, 64, 175, 0.12);
+    color: #1d4ed8;
+}
+
+.order-status-pill.is-checkout {
+    background: rgba(16, 185, 129, 0.14);
+    color: #047857;
+}
+
+.order-status-pill.is-pending,
+.order-status-pill.is-unpaid {
+    background: rgba(148, 163, 184, 0.18);
+    color: #475569;
+}
+
+.order-status-pill.is-partial {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.order-status-pill.is-paid {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.payment-mode-cell {
+    display: grid;
+    gap: 6px;
+    min-width: 140px;
+}
+
+.payment-mode-select {
+    border: 1px solid #dfdfdf;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    max-width: 150px;
+    padding: 0.35rem 0.5rem;
+}
+
+.payment-mode-locked,
+.payment-pending-text {
+    color: #1f2f3e;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.payment-pending-text {
+    color: #898989;
+}
+
+.orders-empty-state {
+    color: #898989;
+    font-weight: 600;
+    padding: 24px !important;
+    text-align: center;
+}
+
+.admin-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.admin-modal.hidden {
+    display: none;
+}
+
+.admin-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgb(0 0 0 / 0.4);
+}
+
+.admin-modal-dialog {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 32rem;
+    border-radius: 0.75rem;
+    background-color: #ffffff;
+    padding: 1.5rem;
+    box-shadow: 0 20px 40px rgb(4 52 106 / 0.18);
+}
