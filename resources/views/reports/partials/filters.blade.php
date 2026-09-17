@@ -4,30 +4,28 @@
     $query = $filters->queryString();
 @endphp
 
-<form method="GET" action="{{ route($filterRoute) }}" class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-6">
-    <div>
-        <label class="mb-1 block text-sm font-semibold text-[#1f2f3e]" for="sdate">Starting Date &amp; Time</label>
+<form method="GET" action="{{ route($filterRoute) }}" class="report-filters">
+    <div class="report-field">
+        <label for="sdate">Starting Date &amp; Time</label>
         <input
             type="datetime-local"
             id="sdate"
             name="sdate"
             value="{{ $sdate }}"
             max="{{ $todayMax }}"
-            class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]"
         >
         @error('sdate')
             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
         @enderror
     </div>
-    <div>
-        <label class="mb-1 block text-sm font-semibold text-[#1f2f3e]" for="edate">Ending Date &amp; Time</label>
+    <div class="report-field">
+        <label for="edate">Ending Date &amp; Time</label>
         <input
             type="datetime-local"
             id="edate"
             name="edate"
             value="{{ $edate }}"
             max="{{ $todayMax }}"
-            class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]"
         >
         @error('edate')
             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -35,23 +33,22 @@
     </div>
 
     @if (! empty($billNoFilter))
-        <div>
-            <label class="mb-1 block text-sm font-semibold text-[#1f2f3e]" for="bill_no">Bill No</label>
+        <div class="report-field">
+            <label for="bill_no">Bill No</label>
             <input
                 type="text"
                 id="bill_no"
                 name="bill_no"
                 value="{{ $filters->billNo }}"
                 placeholder="Filter by Bill No"
-                class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]"
             >
         </div>
     @endif
 
     @if (! empty($billStatusFilter))
-        <div>
-            <label class="mb-1 block text-sm font-semibold text-[#1f2f3e]" for="bill_status">Bill Status</label>
-            <select id="bill_status" name="bill_status" class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]">
+        <div class="report-field">
+            <label for="bill_status">Bill Status</label>
+            <select id="bill_status" name="bill_status">
                 <option value="">All</option>
                 <option value="paid" @selected($filters->billStatus === 'paid')>Paid</option>
                 <option value="unpaid" @selected($filters->billStatus === 'unpaid')>Unpaid</option>
@@ -63,9 +60,9 @@
     @endif
 
     @if (! empty($orderTypeFilter))
-        <div>
-            <label class="mb-1 block text-sm font-semibold text-[#1f2f3e]" for="order_type">Order Type</label>
-            <select id="order_type" name="order_type" class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]">
+        <div class="report-field">
+            <label for="order_type">Order Type</label>
+            <select id="order_type" name="order_type">
                 <option value="">All</option>
                 <option value="through_waiter" @selected($filters->orderType === 'through_waiter')>Through Waiter</option>
                 <option value="dine_in" @selected($filters->orderType === 'dine_in')>Dine-In</option>
@@ -77,8 +74,8 @@
     @endif
 
     @if (! empty($itemNameFilter))
-        <div>
-            <label class="mb-1 block text-sm font-semibold text-[#1f2f3e]" for="item_name">Item</label>
+        <div class="report-field">
+            <label for="item_name">Item</label>
             <input
                 type="text"
                 id="item_name"
@@ -87,7 +84,6 @@
                 value="{{ $filters->itemName }}"
                 placeholder="Search item..."
                 autocomplete="off"
-                class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]"
             >
             <datalist id="item_options">
                 @foreach ($itemOptions as $option)
@@ -97,28 +93,16 @@
         </div>
     @endif
 
-    <div class="flex flex-wrap items-end gap-2">
-        <button type="submit" class="rounded-md bg-[#04346a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#03284f]">
-            Filter
-        </button>
+    <div class="report-actions">
+        <button type="submit" class="report-btn report-btn-primary">Filter</button>
         @if (! empty($showAll))
-            <a href="{{ route($filterRoute, ['show_all' => 1]) }}" class="rounded-md border border-[#dfdfdf] px-4 py-2 text-sm font-semibold text-[#1f2f3e] hover:bg-[#f4f6f9]">
-                Show All
-            </a>
+            <a href="{{ route($filterRoute, ['show_all' => 1]) }}" class="report-btn report-btn-secondary">Show All</a>
         @endif
         @if (! empty($exportEnabled))
-            <a href="{{ route($filterRoute, array_merge($query, ['export' => 'csv'])) }}" class="rounded-md border border-[#dfdfdf] px-4 py-2 text-sm font-semibold text-[#1f2f3e] hover:bg-[#f4f6f9]">
-                CSV
-            </a>
-            <a href="{{ route($filterRoute, array_merge($query, ['export' => 'excel'])) }}" class="rounded-md border border-[#dfdfdf] px-4 py-2 text-sm font-semibold text-[#1f2f3e] hover:bg-[#f4f6f9]">
-                Excel
-            </a>
-            <a href="{{ route($filterRoute, array_merge($query, ['export' => 'pdf'])) }}" class="rounded-md border border-[#dfdfdf] px-4 py-2 text-sm font-semibold text-[#1f2f3e] hover:bg-[#f4f6f9]">
-                PDF
-            </a>
+            <a href="{{ route($filterRoute, array_merge($query, ['export' => 'csv'])) }}" class="report-btn report-btn-export">CSV</a>
+            <a href="{{ route($filterRoute, array_merge($query, ['export' => 'excel'])) }}" class="report-btn report-btn-export">Excel</a>
+            <a href="{{ route($filterRoute, array_merge($query, ['export' => 'pdf'])) }}" class="report-btn report-btn-export">PDF</a>
         @endif
-        <a href="{{ route($filterRoute) }}" class="rounded-md border border-[#dfdfdf] px-4 py-2 text-sm font-semibold text-[#1f2f3e] hover:bg-[#f4f6f9]">
-            Reset
-        </a>
+        <a href="{{ route($filterRoute) }}" class="report-btn report-btn-secondary">Reset</a>
     </div>
 </form>

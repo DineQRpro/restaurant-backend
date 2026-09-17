@@ -3,14 +3,18 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BillPaymentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\KotController;
 use App\Http\Controllers\Admin\Menu\MenuCategoryController;
 use App\Http\Controllers\Admin\Menu\MenuItemController;
+use App\Http\Controllers\Admin\OrderBillController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Counter\AuthController as CounterAuthController;
 use App\Http\Controllers\Counter\BillPaymentController as CounterBillPaymentController;
 use App\Http\Controllers\Counter\DashboardController as CounterDashboardController;
+use App\Http\Controllers\Counter\KotController as CounterKotController;
+use App\Http\Controllers\Counter\OrderBillController as CounterOrderBillController;
 use App\Http\Controllers\Counter\ReportController as CounterReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +37,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/', fn () => redirect()->route('admin.dashboard'));
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         });
+
+        Route::get('/orders/{order}/kot', [KotController::class, 'show'])
+            ->middleware('permission:kot.view')
+            ->name('orders.kot');
+        Route::get('/orders/{order}/kot/edit', [KotController::class, 'edit'])
+            ->middleware('permission:kot.update')
+            ->name('orders.kot.edit');
+        Route::patch('/orders/{order}/kot', [KotController::class, 'update'])
+            ->middleware('permission:kot.update')
+            ->name('orders.kot.update');
+        Route::get('/orders/{order}/bill', [OrderBillController::class, 'show'])
+            ->middleware('permission:bills.view')
+            ->name('orders.bill');
 
         Route::post('/bills/{bill}/payments', [BillPaymentController::class, 'store'])
             ->middleware('permission:bills.settle')
@@ -163,6 +180,19 @@ Route::prefix('counter')->name('counter.')->group(function () {
             Route::get('/', fn () => redirect()->route('counter.dashboard'));
             Route::get('/dashboard', [CounterDashboardController::class, 'index'])->name('dashboard');
         });
+
+        Route::get('/orders/{order}/kot', [CounterKotController::class, 'show'])
+            ->middleware('permission:kot.view')
+            ->name('orders.kot');
+        Route::get('/orders/{order}/kot/edit', [CounterKotController::class, 'edit'])
+            ->middleware('permission:kot.update')
+            ->name('orders.kot.edit');
+        Route::patch('/orders/{order}/kot', [CounterKotController::class, 'update'])
+            ->middleware('permission:kot.update')
+            ->name('orders.kot.update');
+        Route::get('/orders/{order}/bill', [CounterOrderBillController::class, 'show'])
+            ->middleware('permission:bills.view')
+            ->name('orders.bill');
 
         Route::post('/bills/{bill}/payments', [CounterBillPaymentController::class, 'store'])
             ->middleware('permission:bills.settle')

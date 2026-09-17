@@ -81,7 +81,7 @@
 .orders-table {
     border-collapse: separate;
     border-spacing: 0;
-    min-width: 1100px;
+    min-width: 1200px;
     width: 100%;
 }
 
@@ -150,13 +150,18 @@
     border: 1px solid rgba(15, 118, 110, 0.2);
     border-radius: 12px;
     color: #0f766e;
-    cursor: not-allowed;
+    cursor: pointer;
     display: inline-flex;
     height: 42px;
     justify-content: center;
-    opacity: 0.65;
+    opacity: 1;
     padding: 0;
     width: 42px;
+}
+
+.order-action-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
 }
 
 .order-action-btn svg {
@@ -268,4 +273,506 @@
     background-color: #ffffff;
     padding: 1.5rem;
     box-shadow: 0 20px 40px rgb(4 52 106 / 0.18);
+}
+
+.kot-modal-dialog {
+    max-width: 48rem;
+    max-height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.kot-modal-header {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.kot-modal-close {
+    border: 1px solid #dfdfdf;
+    border-radius: 0.375rem;
+    background: #ffffff;
+    color: #1f2f3e;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0.4rem 0.75rem;
+}
+
+.kot-modal-body {
+    margin-top: 1rem;
+    min-height: 4rem;
+    overflow: auto;
+}
+
+.kot-modal-status {
+    color: #425466;
+    font-weight: 600;
+    margin: 0;
+}
+
+.kot-meta {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.kot-meta dt {
+    color: #898989;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.kot-meta dd {
+    color: #1f2f3e;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0.2rem 0 0;
+}
+
+.kot-items-wrap {
+    margin-top: 1rem;
+    overflow-x: auto;
+}
+
+.kot-items-table {
+    border-collapse: collapse;
+    min-width: 36rem;
+    width: 100%;
+}
+
+.kot-items-table th,
+.kot-items-table td {
+    border-bottom: 1px solid #e8eef5;
+    padding: 0.7rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.kot-items-table th {
+    background: #f4f7fb;
+    color: #16324f;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.kot-items-empty {
+    color: #898989;
+    font-weight: 600;
+    text-align: center;
+}
+
+.order-status-pill.is-preparing {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.order-status-pill.is-served {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.order-status-pill.is-cancelled {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.edit-kot-input {
+    border: 1px solid #dfdfdf;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    max-width: 100%;
+    padding: 0.35rem 0.5rem;
+    width: 100%;
+}
+
+.edit-kot-cancel,
+.edit-kot-save {
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.4rem 0.85rem;
+}
+
+.edit-kot-cancel {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.edit-kot-save {
+    background: #04346a;
+    color: #ffffff;
+}
+
+.edit-kot-save:disabled,
+.edit-kot-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.edit-kot-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.bill-totals {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 1rem;
+}
+
+.bill-totals dt {
+    color: #898989;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.bill-totals dd {
+    color: #1f2f3e;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0.2rem 0 0;
+}
+
+.bill-payments {
+    margin-top: 1rem;
+}
+
+.bill-payments h4 {
+    color: #16324f;
+    font-size: 0.85rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+}
+
+.bill-payments p {
+    color: #1f2f3e;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0.2rem 0;
+}
+
+@media (max-width: 640px) {
+    .kot-meta,
+    .bill-totals {
+        grid-template-columns: 1fr;
+    }
+}
+
+.report-page {
+    color: #2c323f;
+}
+
+.report-breadcrumb {
+    color: #898989;
+    font-size: 0.8125rem;
+    margin-bottom: 1rem;
+}
+
+.report-card {
+    background: #ffffff;
+    border: 1px solid #e6edef;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgb(4 52 106 / 0.06);
+    overflow: hidden;
+}
+
+.report-toolbar {
+    border-bottom: 1px solid #eef1f5;
+    padding: 1rem 1.25rem 0.85rem;
+}
+
+.report-filters {
+    align-items: end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 0.85rem;
+    justify-content: flex-end;
+}
+
+body.thermal-report-page .report-filters {
+    justify-content: flex-start;
+}
+
+.report-field {
+    flex: 0 1 220px;
+    min-width: 180px;
+}
+
+.report-field label,
+.report-filters label {
+    color: #1f2f3e;
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.report-field input,
+.report-field select,
+.report-filters input,
+.report-filters select {
+    border: 1px solid #d5dee8;
+    border-radius: 0.3rem;
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    min-height: 2.1rem;
+    padding: 0.35rem 0.6rem;
+    width: 100%;
+}
+
+.report-field input:focus,
+.report-field select:focus,
+.report-filters input:focus,
+.report-filters select:focus {
+    border-color: #04346a;
+    outline: none;
+}
+
+.report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    min-height: 2.1rem;
+}
+
+.report-btn,
+.report-actions a,
+.report-actions button {
+    align-items: center;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+    min-height: 2.1rem;
+    padding: 0.45rem 0.9rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.report-btn-primary,
+.report-actions button[type="submit"] {
+    background: #04346a;
+    border: 1px solid #04346a;
+    color: #ffffff;
+}
+
+.report-btn-primary:hover,
+.report-actions button[type="submit"]:hover {
+    background: #03284f;
+}
+
+.report-btn-secondary,
+.report-actions a {
+    background: #ffffff;
+    border: 1px solid #d5dee8;
+    color: #1f2f3e;
+}
+
+.report-btn-secondary:hover,
+.report-actions a:hover {
+    background: #f4f6f9;
+}
+
+.report-actions a.report-btn-export {
+    background: #04346a;
+    border: 1px solid #04346a;
+    color: #ffffff;
+}
+
+.report-actions a.report-btn-export:hover {
+    background: #03284f;
+    color: #ffffff;
+}
+
+.report-actions button.report-btn-print,
+.report-btn-print {
+    background: #198754;
+    border: 1px solid #157347;
+    color: #ffffff;
+}
+
+.report-actions button.report-btn-print:hover,
+.report-btn-print:hover {
+    background: #157347;
+    color: #ffffff;
+}
+
+.thermal-print-actions {
+    display: inline-flex;
+    gap: 0.45rem;
+}
+
+.report-body {
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.report-record-count {
+    color: #1f2f3e;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.report-table-wrap {
+    overflow-x: auto;
+}
+
+.report-page .report-table {
+    border-collapse: collapse;
+    min-width: 640px;
+    width: 100%;
+}
+
+.report-page .report-table thead th {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eaeaea;
+    color: #2c323f;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    padding: 0.65rem 0.75rem;
+    text-transform: none;
+    white-space: nowrap;
+}
+
+.report-page .report-table tbody td,
+.report-page .report-table tfoot td {
+    border-bottom: 1px solid #f0f0f0;
+    color: #2c323f;
+    font-size: 0.8125rem;
+    padding: 0.55rem 0.75rem;
+    vertical-align: middle;
+}
+
+.report-page .report-table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+.report-page .report-table tfoot td,
+.report-page .report-total-row td {
+    background: #f4f6f9;
+    border-top: 1px solid #d5dee8;
+    font-weight: 700;
+}
+
+.report-page .report-table .text-right {
+    text-align: right;
+}
+
+.report-page .report-table--thermal thead th,
+.report-page .report-table--thermal tbody td,
+.report-page .report-table--thermal tfoot td {
+    border: 1px solid #e6edef;
+    padding: 0.45rem 0.65rem;
+}
+
+.report-page .report-table--thermal tbody tr:nth-child(even) td {
+    background: #fafbfc;
+}
+
+.report-empty {
+    color: #898989 !important;
+    font-weight: 600;
+    text-align: center;
+}
+
+.thermal-print-report {
+    display: none;
+}
+
+.thermal-print-report .center { text-align: center; }
+.thermal-print-report .bold { font-weight: 700; }
+.thermal-print-report hr {
+    border: none;
+    border-top: 1px dashed #000;
+    margin: 6px 0;
+}
+.thermal-print-report .thermal-summary-line {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin: 2px 0;
+    white-space: nowrap;
+}
+.thermal-print-report .thermal-summary-label { flex: 1 1 auto; padding-right: 8px; text-align: left; }
+.thermal-print-report .thermal-summary-value { flex: 0 0 auto; text-align: right; }
+.thermal-print-report .item { display: flex; flex-shrink: 0; margin: 1px 0; }
+.thermal-print-report .col-sl { flex-shrink: 0; text-align: left; width: 10%; }
+.thermal-print-report .col-amt { flex-shrink: 0; text-align: right; width: 22%; }
+.thermal-print-report .col-tax { flex-shrink: 0; text-align: right; width: 22%; }
+.thermal-print-report .col-billno { flex-shrink: 0; text-align: left; width: 28%; }
+.thermal-print-report .col-name { flex-shrink: 0; min-width: 0; width: 42%; word-wrap: break-word; }
+.thermal-print-report .col-qty { flex-shrink: 0; text-align: center; width: 14%; }
+.thermal-print-report .big { font-size: 14px; font-weight: 700; }
+.thermal-print-report .meta { margin: 2px 0; }
+
+@media print {
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+
+    body.thermal-report-page {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.thermal-report-page aside,
+    body.thermal-report-page header,
+    body.thermal-report-page nav,
+    body.thermal-report-page .no-print,
+    body.thermal-report-page .report-page,
+    body.thermal-report-page .report-toolbar,
+    body.thermal-report-page .report-breadcrumb,
+    body.thermal-report-page .thermal-print-actions,
+    #admin-sidebar,
+    #counter-sidebar,
+    #admin-sidebar-backdrop,
+    #counter-sidebar-backdrop {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    body.thermal-report-page * {
+        visibility: hidden !important;
+    }
+
+    body.thermal-report-page #thermal-print-root,
+    body.thermal-report-page #thermal-print-root * {
+        visibility: visible !important;
+    }
+
+    body.thermal-report-page #thermal-print-root {
+        color: #000;
+        display: block !important;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        left: 0;
+        line-height: 1.3;
+        padding: 5mm 0 0 4mm;
+        position: absolute;
+        top: 0;
+        width: 74mm;
+        box-sizing: border-box;
+    }
 }

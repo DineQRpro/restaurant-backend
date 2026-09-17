@@ -5,6 +5,11 @@
 @section('page-subtitle', $dashboard['date'])
 
 @section('content')
+    @php
+        $canViewKot = $canViewKot ?? false;
+        $canEditKot = $canEditKot ?? false;
+        $canViewBill = $canViewBill ?? false;
+    @endphp
     @include('shared.dashboard.overview', ['dashboard' => $dashboard])
 
     <section class="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -32,6 +37,12 @@
             @include('shared.dashboard.track-orders', [
                 'dashboard' => $dashboard,
                 'canShowPaymentSelect' => $canSettleBills,
+                'canViewKot' => $canViewKot,
+                'canEditKot' => $canEditKot,
+                'canViewBill' => $canViewBill,
+                'kotRouteName' => 'admin.orders.kot',
+                'editKotRouteName' => 'admin.orders.kot.edit',
+                'billRouteName' => 'admin.orders.bill',
                 'paymentInteractive' => true,
                 'chooseMethodLabel' => 'Select Payment',
                 'paymentStoreRouteName' => 'admin.bills.payments.store',
@@ -53,6 +64,10 @@
             @endif
         </div>
     </section>
+
+    @if ($canViewKot || $canEditKot || $canViewBill)
+        @include('shared.dashboard.order-action-modals')
+    @endif
 
     @if ($canSettleBills && $dashboard['payment_methods']->isNotEmpty())
         <div id="admin-payment-modal" class="admin-modal hidden" aria-hidden="true">

@@ -41,4 +41,24 @@ enum OrderItemStatus: string
 
         return in_array($status, [self::Preparing, self::Served, self::Cancelled], true);
     }
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Pending => 'Pending',
+            self::Preparing => 'Preparing',
+            self::Served => 'Served',
+            self::Cancelled => 'Cancelled',
+        };
+    }
+
+    public function cssClass(): string
+    {
+        return match ($this) {
+            self::Pending => 'is-pending',
+            self::Preparing => 'is-preparing',
+            self::Served => 'is-served',
+            self::Cancelled => 'is-cancelled',
+        };
+    }
 }

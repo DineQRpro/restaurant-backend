@@ -14,9 +14,14 @@ class DashboardController extends Controller
 
     public function index(): View
     {
+        $user = auth()->user();
+
         return view('admin.dashboard.index', [
             'dashboard' => $this->dashboardService->summary(),
-            'canSettleBills' => auth()->user()?->hasPermission('bills.settle') ?? false,
+            'canSettleBills' => $user?->hasPermission('bills.settle') ?? false,
+            'canViewKot' => $user?->hasPermission('kot.view') ?? false,
+            'canEditKot' => $user?->hasPermission('kot.update') ?? false,
+            'canViewBill' => $user?->hasPermission('bills.view') ?? false,
         ]);
     }
 }

@@ -157,6 +157,7 @@ class DashboardService
                 'dineType:id,name,slug',
                 'latestBill.payments.paymentMethod:id,name,is_active',
             ])
+            ->withCount('items')
             ->orderByDesc('started_at')
             ->orderByDesc('id')
             ->get();
@@ -184,6 +185,9 @@ class DashboardService
             return [
                 'order_id' => $order->id,
                 'order_number' => $order->order_number,
+                'has_items' => $order->items_count > 0,
+                'can_edit_kot' => $order->isActive() && $order->items_count > 0 && $bill === null,
+                'can_view_bill' => $bill !== null,
                 'table_display' => $this->tableDisplay($order),
                 'dine_type_name' => $order->dineType?->name ?? '—',
                 'display_date' => $order->created_at

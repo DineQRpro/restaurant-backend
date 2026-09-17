@@ -5,6 +5,11 @@
 @section('page-subtitle', $dashboard['date'])
 
 @section('content')
+    @php
+        $canViewKot = $canViewKot ?? false;
+        $canEditKot = $canEditKot ?? false;
+        $canViewBill = $canViewBill ?? false;
+    @endphp
     @include('shared.dashboard.overview', ['dashboard' => $dashboard])
 
     @include('shared.dashboard.table-board', ['dashboard' => $dashboard])
@@ -17,6 +22,12 @@
             @include('shared.dashboard.track-orders', [
                 'dashboard' => $dashboard,
                 'canShowPaymentSelect' => $canShowPaymentSelect,
+                'canViewKot' => $canViewKot,
+                'canEditKot' => $canEditKot,
+                'canViewBill' => $canViewBill,
+                'kotRouteName' => 'counter.orders.kot',
+                'editKotRouteName' => 'counter.orders.kot.edit',
+                'billRouteName' => 'counter.orders.bill',
                 'paymentInteractive' => true,
                 'chooseMethodLabel' => 'Choose Method',
                 'paymentStoreRouteName' => 'counter.bills.payments.store',
@@ -25,6 +36,10 @@
             ])
         </div>
     </section>
+
+    @if ($canViewKot || $canEditKot || $canViewBill)
+        @include('shared.dashboard.order-action-modals')
+    @endif
 
     @if ($canShowPaymentSelect && $dashboard['payment_methods']->isNotEmpty())
         <div
