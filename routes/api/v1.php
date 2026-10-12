@@ -8,6 +8,9 @@ use App\Http\Controllers\Api\V1\Menu\MenuCategoryController;
 use App\Http\Controllers\Api\V1\Menu\MenuItemController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\OrderItemController;
+use App\Http\Controllers\Api\V1\OrderMergeController;
+use App\Http\Controllers\Api\V1\OrderSeatingController;
+use App\Http\Controllers\Api\V1\OrderTransferController;
 use App\Http\Controllers\Api\V1\TableController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/tables', [TableController::class, 'index'])
         ->middleware('permission:tables.view');
+    Route::get('/tables/{table}/merge-options', [OrderMergeController::class, 'tableOptions'])
+        ->middleware('permission:tables.merge');
     Route::get('/tables/{table}', [TableController::class, 'show'])
         ->middleware('permission:tables.view');
 
@@ -81,13 +86,32 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/tables/{table}/active-order/items', [OrderItemController::class, 'activeForTable'])
         ->middleware('permission:orders.view');
+    Route::get('/orders/{order}/items', [OrderItemController::class, 'forOrder'])
+        ->middleware('permission:orders.view');
+
+    Route::get('/orders/{order}/merge-tables', [OrderMergeController::class, 'options'])
+        ->middleware('permission:tables.merge');
+    Route::put('/orders/{order}/merge-tables', [OrderMergeController::class, 'update'])
+        ->middleware('permission:tables.merge');
+
+    Route::get('/orders/{order}/transfer-options', [OrderTransferController::class, 'options'])
+        ->middleware('permission:tables.transfer');
+    Route::post('/orders/{order}/transfer', [OrderTransferController::class, 'store'])
+        ->middleware('permission:tables.transfer');
 
     Route::patch('/order-items/status', [OrderItemController::class, 'updateStatus'])
         ->middleware('permission:orders.item_status');
 
     Route::get('/tables/{table}/checkout-preview', [CheckoutController::class, 'preview'])
         ->middleware('permission:bills.create');
+    Route::get('/orders/{order}/checkout-preview', [CheckoutController::class, 'previewOrder'])
+        ->middleware('permission:bills.create');
 
     Route::post('/orders/{order}/checkout', [CheckoutController::class, 'store'])
         ->middleware('permission:bills.create');
+
+    Route::patch('/orders/{order}/seating/clean', [OrderSeatingController::class, 'clean'])
+        ->middleware('permission:tables.clean');
+    Route::patch('/tables/{table}/seating/clean', [OrderSeatingController::class, 'cleanTable'])
+        ->middleware('permission:tables.clean');
 });

@@ -18,7 +18,7 @@ class TableFactory extends Factory
         return [
             'number' => (string) fake()->unique()->numberBetween(1, 9999),
             'description' => fake()->optional()->words(3, true),
-            'capacity' => fake()->numberBetween(1, 8),
+            'capacity' => 4,
             'code' => (string) fake()->unique()->numerify('##########'),
             'sort_order' => 0,
             'status' => 0,

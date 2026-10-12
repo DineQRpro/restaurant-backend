@@ -61,6 +61,20 @@ class Table extends Model
         );
     }
 
+    public function unreleasedOrders(): HasMany
+    {
+        return $this->hasMany(Order::class)
+            ->unreleased()
+            ->orderBy('id');
+    }
+
+    public function cleaningHolds(): HasMany
+    {
+        return $this->hasMany(TableCleaningHold::class)
+            ->unreleased()
+            ->orderBy('id');
+    }
+
     /**
      * @param  Builder<Table>  $query
      * @return Builder<Table>

@@ -10,7 +10,7 @@ class ReportExportAssembler
 {
     /**
      * @param  Collection<int, object>  $rows
-     * @param  array{count: int, grand_total: float, discount_total: float, tax_total: float}  $totals
+     * @param  array{count: int, grand_total: float, discount_total: float, tax_total: float, additional_charges_total?: float}  $totals
      */
     public function transaction(string $title, ReportFilters $filters, Collection $rows, array $totals): ReportExportDocument
     {
@@ -32,7 +32,7 @@ class ReportExportAssembler
                 $row->payment_type,
                 $row->payment_status,
             ])->all(),
-            totals: ['Totals', '', '', $totals['grand_total'], $totals['discount_total'], '', '', $totals['tax_total'], 0, $totals['grand_total'], '', ''],
+            totals: ['Totals', '', '', $totals['grand_total'], $totals['discount_total'], '', '', $totals['tax_total'], $totals['additional_charges_total'] ?? 0, $totals['grand_total'], '', ''],
             meta: $this->meta($filters),
             moneyColumns: [3, 4, 7, 8, 9],
             landscape: true,

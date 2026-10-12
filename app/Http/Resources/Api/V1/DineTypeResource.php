@@ -18,6 +18,7 @@ class DineTypeResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'requires_table' => $this->requiresTable(),
+            'requires_full_table' => $this->requiresFullTable(),
             'sort_order' => $this->sort_order,
         ];
     }

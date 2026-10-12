@@ -19,6 +19,7 @@ class UpdateOrderItemStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'order_id' => ['nullable', 'integer', 'exists:orders,id'],
             'order_item_ids' => ['required', 'array', 'min:1'],
             'order_item_ids.*' => ['integer', 'distinct', 'exists:order_items,id'],
             'status' => ['required', 'string', Rule::in(OrderItemStatus::assignableValues())],

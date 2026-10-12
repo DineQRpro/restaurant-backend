@@ -19,6 +19,7 @@ class Bill extends Model
         'discount_amount',
         'taxable_amount',
         'tax_amount',
+        'additional_charges',
         'round_off',
         'grand_total',
         'status',
@@ -34,6 +35,7 @@ class Bill extends Model
             'discount_amount' => 'decimal:2',
             'taxable_amount' => 'decimal:2',
             'tax_amount' => 'decimal:2',
+            'additional_charges' => 'decimal:2',
             'round_off' => 'decimal:2',
             'grand_total' => 'decimal:2',
             'status' => BillStatus::class,
@@ -45,6 +47,11 @@ class Bill extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function discount(): BelongsTo
+    {
+        return $this->belongsTo(Discount::class);
     }
 
     public function items(): HasMany

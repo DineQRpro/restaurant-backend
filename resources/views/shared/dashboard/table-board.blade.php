@@ -35,11 +35,24 @@
         @else
             <div class="admin-table-board">
                 @foreach ($dashboard['tables'] as $table)
-                    <article class="admin-table-board-card {{ $table->status->cssClass() }}">
+                    @php
+                        $occupancyService = app(\App\Services\Table\TableOccupancyService::class);
+                        $occupancy = $occupancyService->snapshot($table);
+                        $host = $occupancyService->hostOrderForSatellite($table);
+                        $host?->loadMissing('table:id,number');
+                    @endphp
+                    <article class="admin-table-board-card {{ $host ? 'admin-table-status-merged' : $occupancy->status->cssClass() }}">
                         <p class="text-lg font-bold leading-tight">Table {{ $table->number }}</p>
-                        <p class="mt-1 text-sm font-semibold">{{ $table->status->label() }}</p>
+                        @if ($host)
+                            <p class="mt-1 text-sm font-semibold">Merged → {{ $host->table?->number }}</p>
+                        @else
+                            <p class="mt-1 text-sm font-semibold">{{ $occupancy->status->label() }}</p>
+                        @endif
                         <p class="mt-1 text-xs opacity-90">
                             {{ $table->capacity }} {{ $table->capacity === 1 ? 'Chair' : 'Chairs' }}
+                        </p>
+                        <p class="mt-1 text-xs opacity-90">
+                            {{ $occupancy->occupiedSeats }} occupied / {{ $occupancy->cleaningSeats }} cleaning / {{ $occupancy->availableSeats }} available
                         </p>
                     </article>
                 @endforeach

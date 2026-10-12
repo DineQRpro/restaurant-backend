@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\Order;
+use App\Services\Table\TableOccupancyService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,6 +30,9 @@ class BillResource extends JsonResource
 
         $order = $this->whenLoaded('order');
         $table = $order && $order->relationLoaded('table') ? $order->table : null;
+        $occupancy = $table
+            ? app(TableOccupancyService::class)->snapshot($table)->toArray()
+            : null;
 
         return [
             'id' => $this->id,
@@ -54,8 +59,11 @@ class BillResource extends JsonResource
             ] : null,
             'table' => $table ? [
                 'id' => $table->id,
-                'number' => $table->number,
+                'number' => $order instanceof Order
+                    ? $order->tableDisplayName()
+                    : $table->number,
                 'status' => $table->status instanceof \BackedEnum ? $table->status->value : $table->status,
+                'occupancy' => $occupancy,
             ] : null,
             'items' => BillItemResource::collection($this->whenLoaded('items')),
         ];

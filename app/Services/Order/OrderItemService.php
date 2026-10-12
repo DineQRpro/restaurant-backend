@@ -25,6 +25,11 @@ class OrderItemService
             throw new BusinessConflictException('The selected table is inactive.');
         }
 
+        $activeCount = Order::query()->active()->where('table_id', $table->id)->count();
+        if ($activeCount > 1) {
+            throw new BusinessConflictException('Multiple parties are seated at this table. Open a specific partition.');
+        }
+
         $order = $this->orderService->findActiveOrderForTable($table->id, false);
 
         if (! $order) {
@@ -34,7 +39,20 @@ class OrderItemService
             ];
         }
 
-        $order->load(['customer', 'items.menuItem']);
+        $order->load(['customer', 'items.menuItem', 'table', 'dineType']);
+
+        return [
+            'order' => $order,
+            'items' => $order->items,
+        ];
+    }
+
+    /**
+     * @return array{order: ?Order, items: Collection<int, OrderItem>}
+     */
+    public function itemsForOrder(Order $order): array
+    {
+        $order->load(['customer', 'items.menuItem', 'table', 'dineType']);
 
         return [
             'order' => $order,
@@ -46,9 +64,9 @@ class OrderItemService
      * @param  list<int>  $itemIds
      * @return Collection<int, OrderItem>
      */
-    public function updateStatuses(array $itemIds, OrderItemStatus $status): Collection
+    public function updateStatuses(array $itemIds, OrderItemStatus $status, ?int $orderId = null): Collection
     {
-        return DB::transaction(function () use ($itemIds, $status) {
+        return DB::transaction(function () use ($itemIds, $status, $orderId) {
             $items = OrderItem::query()
                 ->whereIn('id', $itemIds)
                 ->with('order')
@@ -58,6 +76,15 @@ class OrderItemService
 
             if ($items->count() !== count(array_unique($itemIds))) {
                 throw new BusinessConflictException('One or more order items were not found.');
+            }
+
+            $orderIds = $items->map(fn (OrderItem $item): int => (int) $item->order_id)->unique()->values();
+            if ($orderIds->count() !== 1) {
+                throw new BusinessConflictException('Order items must belong to a single order.');
+            }
+
+            if ($orderId !== null && $orderIds->first() !== $orderId) {
+                throw new BusinessConflictException('Order items must belong to the selected order.');
             }
 
             foreach ($itemIds as $itemId) {

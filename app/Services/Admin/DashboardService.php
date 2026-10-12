@@ -12,12 +12,14 @@ use App\Models\PaymentMethod;
 use App\Models\Table;
 use App\Models\User;
 use App\Services\Payment\PaymentService;
+use App\Services\Table\TableOccupancyService;
 use Illuminate\Support\Collection;
 
 class DashboardService
 {
     public function __construct(
         private readonly PaymentService $paymentService,
+        private readonly TableOccupancyService $occupancy,
     ) {}
 
     /**
@@ -47,6 +49,7 @@ class DashboardService
 
         $tables = Table::query()
             ->active()
+            ->with(['unreleasedOrders'])
             ->orderBy('sort_order')
             ->orderBy('number')
             ->get([
@@ -63,6 +66,24 @@ class DashboardService
             ->selectRaw('status, COUNT(*) as aggregate')
             ->groupBy('status')
             ->pluck('aggregate', 'status');
+
+        $occupancyService = $this->occupancy;
+        $tableCounts = [
+            'total' => $tables->count(),
+            'available' => 0,
+            'occupied' => 0,
+            'cleaning' => 0,
+        ];
+        foreach ($tables as $table) {
+            $status = $occupancyService->snapshot($table)->status;
+            if ($status === TableOperationalStatus::Available) {
+                $tableCounts['available']++;
+            } elseif ($status === TableOperationalStatus::Occupied) {
+                $tableCounts['occupied']++;
+            } elseif ($status === TableOperationalStatus::Cleaning) {
+                $tableCounts['cleaning']++;
+            }
+        }
 
         $amountReceived = $this->paymentService->amountReceivedToday();
         $paymentMethods = $this->activePaymentMethods();
@@ -112,12 +133,7 @@ class DashboardService
             'category_count' => MenuCategory::query()->count(),
             'menu_item_count' => MenuItem::query()->count(),
             'tables' => $tables,
-            'table_counts' => [
-                'total' => $tables->count(),
-                'available' => $tables->where('status', TableOperationalStatus::Available)->count(),
-                'occupied' => $tables->where('status', TableOperationalStatus::Occupied)->count(),
-                'cleaning' => $tables->where('status', TableOperationalStatus::Cleaning)->count(),
-            ],
+            'table_counts' => $tableCounts,
             'table_statuses' => array_map(
                 fn (TableOperationalStatus $status): array => [
                     'label' => $status->label(),
@@ -213,15 +229,7 @@ class DashboardService
 
     private function tableDisplay(Order $order): string
     {
-        if ($order->table?->number) {
-            return $order->table->number;
-        }
-
-        if ($order->dineType && ! $order->dineType->requiresTable()) {
-            return 'Take Away';
-        }
-
-        return $order->dineType?->name ?: 'Take Away';
+        return $order->tableDisplayName();
     }
 
     /**

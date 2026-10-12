@@ -19,20 +19,32 @@ class Order extends Model
         'table_id',
         'waiter_id',
         'pax',
+        'allocated_seats',
+        'partition_label',
+        'merged_tables',
+        'joined_into_order_id',
+        'joined_at',
         'status',
         'started_at',
         'completed_at',
         'cancelled_at',
+        'seating_cleaned_at',
+        'cleaning_started_at',
     ];
 
     protected function casts(): array
     {
         return [
             'pax' => 'integer',
+            'allocated_seats' => 'integer',
+            'merged_tables' => 'array',
+            'joined_at' => 'datetime',
             'status' => OrderStatus::class,
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'seating_cleaned_at' => 'datetime',
+            'cleaning_started_at' => 'datetime',
         ];
     }
 
@@ -71,11 +83,32 @@ class Order extends Model
         return $this->hasOne(Bill::class)->latestOfMany();
     }
 
+    public function transfers(): HasMany
+    {
+        return $this->hasMany(OrderTransfer::class, 'source_order_id');
+    }
+
+    public function joinedInto(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'joined_into_order_id');
+    }
+
+    public function joinedSources(): HasMany
+    {
+        return $this->hasMany(self::class, 'joined_into_order_id');
+    }
+
+    public function isJoined(): bool
+    {
+        return $this->joined_into_order_id !== null;
+    }
+
     public function isActive(): bool
     {
         return $this->status === OrderStatus::Placed
             && $this->completed_at === null
-            && $this->cancelled_at === null;
+            && $this->cancelled_at === null
+            && ! $this->isJoined();
     }
 
     public function itemsTotal(): float
@@ -93,7 +126,130 @@ class Order extends Model
     {
         return $query->where('status', OrderStatus::Placed)
             ->whereNull('completed_at')
-            ->whereNull('cancelled_at');
+            ->whereNull('cancelled_at')
+            ->whereNull('joined_into_order_id');
+    }
+
+    /**
+     * Table allocations that still consume physical capacity.
+     *
+     * @param  Builder<Order>  $query
+     * @return Builder<Order>
+     */
+    public function scopeUnreleased(Builder $query): Builder
+    {
+        $cutoff = now()->subSeconds(max(1, (int) config('restaurant.cleaning_duration_seconds', 300)));
+
+        return $query
+            ->whereNotNull('table_id')
+            ->whereNull('cancelled_at')
+            ->where(function (Builder $query) use ($cutoff): void {
+                $query->where(function (Builder $query): void {
+                    $query->where('status', OrderStatus::Placed)
+                        ->whereNull('completed_at');
+                })->orWhere(function (Builder $query) use ($cutoff): void {
+                    $query->where('status', OrderStatus::Checkout)
+                        ->whereNull('seating_cleaned_at')
+                        ->where(function (Builder $query) use ($cutoff): void {
+                            $query->where('cleaning_started_at', '>', $cutoff)
+                                ->orWhere(function (Builder $query) use ($cutoff): void {
+                                    $query->whereNull('cleaning_started_at')
+                                        ->where('updated_at', '>', $cutoff);
+                                });
+                        });
+                });
+            });
+    }
+
+    public function displayTableLabel(): ?string
+    {
+        $relatedTable = $this->getRelationValue('table');
+        $number = $relatedTable?->number;
+        if ($number === null || $number === '') {
+            return null;
+        }
+
+        if (is_string($this->partition_label) && $this->partition_label !== '') {
+            return $number.'-'.$this->partition_label;
+        }
+
+        return $number;
+    }
+
+    public function tableDisplayName(): string
+    {
+        $snapshots = $this->mergedTableSnapshots();
+        $relatedTable = $this->getRelationValue('table');
+        $number = $relatedTable?->number;
+
+        if ($snapshots !== [] && is_string($number) && $number !== '') {
+            $parts = array_merge([$number], array_column($snapshots, 'number'));
+
+            return implode(' + ', $parts);
+        }
+
+        $label = $this->displayTableLabel();
+        if ($label !== null) {
+            return $label;
+        }
+
+        if ($this->dineType && ! $this->dineType->requiresTable()) {
+            return 'Take Away';
+        }
+
+        if (is_string($number) && $number !== '') {
+            return $number;
+        }
+
+        return $this->dineType?->name ?: 'Take Away';
+    }
+
+    /**
+     * Historical satellite snapshots: [{id, number}, ...]. Does not include the main table.
+     *
+     * @return list<array{id: int, number: string}>
+     */
+    public function mergedTableSnapshots(): array
+    {
+        $raw = $this->merged_tables;
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        $snapshots = [];
+        foreach ($raw as $row) {
+            if (! is_array($row) || ! isset($row['id'], $row['number'])) {
+                continue;
+            }
+
+            $number = trim((string) $row['number']);
+            if ($number === '') {
+                continue;
+            }
+
+            $snapshots[] = [
+                'id' => (int) $row['id'],
+                'number' => $number,
+            ];
+        }
+
+        return $snapshots;
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function mergedTableIds(): array
+    {
+        return array_values(array_map(
+            fn (array $snapshot): int => $snapshot['id'],
+            $this->mergedTableSnapshots(),
+        ));
+    }
+
+    public function hasMergedTables(): bool
+    {
+        return $this->mergedTableSnapshots() !== [];
     }
 
     /**
@@ -112,6 +268,7 @@ class Order extends Model
 
         return $query
             ->whereNull('cancelled_at')
+            ->whereNull('joined_into_order_id')
             ->where(function (Builder $query) use ($todayStart): void {
                 $query->where('status', OrderStatus::Placed)
                     ->orWhere(function (Builder $query) use ($todayStart): void {

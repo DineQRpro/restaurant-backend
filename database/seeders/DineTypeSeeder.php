@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\DineType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DineTypeSeeder extends Seeder
@@ -20,6 +19,7 @@ class DineTypeSeeder extends Seeder
                 'description' => 'Restaurant dine-in service',
                 'sort_order' => 1,
                 'is_active' => true,
+                'requires_full_table' => false,
             ]
         );
 
@@ -30,6 +30,7 @@ class DineTypeSeeder extends Seeder
                 'description' => 'Take away order',
                 'sort_order' => 2,
                 'is_active' => true,
+                'requires_full_table' => false,
             ]
         );
 
@@ -40,6 +41,7 @@ class DineTypeSeeder extends Seeder
                 'description' => 'Couple dining service',
                 'sort_order' => 3,
                 'is_active' => true,
+                'requires_full_table' => true,
             ]
         );
 
@@ -50,6 +52,7 @@ class DineTypeSeeder extends Seeder
                 'description' => 'Candle light dinner service',
                 'sort_order' => 4,
                 'is_active' => true,
+                'requires_full_table' => true,
             ]
         );
     }

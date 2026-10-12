@@ -95,6 +95,10 @@ class TableService
             'currentOrder.customer',
             'currentOrder.dineType',
             'currentOrder.items',
+            'unreleasedOrders.customer',
+            'unreleasedOrders.dineType',
+            'unreleasedOrders.items',
+            'cleaningHolds',
         ];
     }
 }

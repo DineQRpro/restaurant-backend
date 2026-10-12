@@ -63,7 +63,7 @@
                             <td class="text-right">{{ number_format((float) $totals['discount_total'], 2) }}</td>
                             <td colspan="2"></td>
                             <td class="text-right">{{ number_format((float) $totals['tax_total'], 2) }}</td>
-                            <td class="text-right">0.00</td>
+                            <td class="text-right">{{ number_format((float) ($totals['additional_charges_total'] ?? 0), 2) }}</td>
                             <td class="text-right">{{ number_format((float) $totals['grand_total'], 2) }}</td>
                             <td colspan="2"></td>
                         </tr>

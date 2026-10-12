@@ -3,10 +3,12 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BillPaymentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DiscountController;
 use App\Http\Controllers\Admin\KotController;
 use App\Http\Controllers\Admin\Menu\MenuCategoryController;
 use App\Http\Controllers\Admin\Menu\MenuItemController;
 use App\Http\Controllers\Admin\OrderBillController;
+use App\Http\Controllers\Admin\ReceiptController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\UserController;
@@ -19,7 +21,7 @@ use App\Http\Controllers\Counter\ReportController as CounterReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('admin.login');
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -50,6 +52,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/orders/{order}/bill', [OrderBillController::class, 'show'])
             ->middleware('permission:bills.view')
             ->name('orders.bill');
+        Route::get('/orders/{order}/bill/print', [OrderBillController::class, 'print'])
+            ->middleware('permission:bills.view')
+            ->name('orders.bill.print');
+        Route::post('/orders/{order}/bill/adjustments', [OrderBillController::class, 'updateAdjustments'])
+            ->middleware('permission:bills.discount')
+            ->name('orders.bill.adjustments');
 
         Route::post('/bills/{bill}/payments', [BillPaymentController::class, 'store'])
             ->middleware('permission:bills.settle')
@@ -151,6 +159,51 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 ->name('destroy');
         });
 
+        Route::prefix('discounts')->name('discounts.')->group(function () {
+            Route::get('/', [DiscountController::class, 'index'])
+                ->middleware('permission:discounts.view')
+                ->name('index');
+            Route::get('/create', [DiscountController::class, 'create'])
+                ->middleware('permission:discounts.create')
+                ->name('create');
+            Route::post('/', [DiscountController::class, 'store'])
+                ->middleware('permission:discounts.create')
+                ->name('store');
+            Route::get('/{discount}/edit', [DiscountController::class, 'edit'])
+                ->middleware('permission:discounts.update')
+                ->name('edit');
+            Route::put('/{discount}', [DiscountController::class, 'update'])
+                ->middleware('permission:discounts.update')
+                ->name('update');
+            Route::patch('/{discount}/status', [DiscountController::class, 'updateStatus'])
+                ->middleware('permission:discounts.update')
+                ->name('status');
+            Route::delete('/{discount}', [DiscountController::class, 'destroy'])
+                ->middleware('permission:discounts.delete')
+                ->name('destroy');
+        });
+
+        Route::prefix('receipts')->name('receipts.')->group(function () {
+            Route::get('/', [ReceiptController::class, 'index'])
+                ->middleware('permission:receipts.view')
+                ->name('index');
+            Route::get('/create', [ReceiptController::class, 'create'])
+                ->middleware('permission:receipts.create')
+                ->name('create');
+            Route::post('/', [ReceiptController::class, 'store'])
+                ->middleware('permission:receipts.create')
+                ->name('store');
+            Route::get('/{receipt}/edit', [ReceiptController::class, 'edit'])
+                ->middleware('permission:receipts.update')
+                ->name('edit');
+            Route::put('/{receipt}', [ReceiptController::class, 'update'])
+                ->middleware('permission:receipts.update')
+                ->name('update');
+            Route::get('/{receipt}/print', [ReceiptController::class, 'print'])
+                ->middleware('permission:receipts.print')
+                ->name('print');
+        });
+
         Route::prefix('reports')->name('reports.')->middleware('permission:reports.view')->group(function () {
             Route::get('/item-summary', [ReportController::class, 'itemSummary'])->name('item-summary');
             Route::get('/bill-summary', [ReportController::class, 'billSummary'])->name('bill-summary');
@@ -193,6 +246,12 @@ Route::prefix('counter')->name('counter.')->group(function () {
         Route::get('/orders/{order}/bill', [CounterOrderBillController::class, 'show'])
             ->middleware('permission:bills.view')
             ->name('orders.bill');
+        Route::get('/orders/{order}/bill/print', [CounterOrderBillController::class, 'print'])
+            ->middleware('permission:bills.view')
+            ->name('orders.bill.print');
+        Route::post('/orders/{order}/bill/adjustments', [CounterOrderBillController::class, 'updateAdjustments'])
+            ->middleware('permission:bills.discount')
+            ->name('orders.bill.adjustments');
 
         Route::post('/bills/{bill}/payments', [CounterBillPaymentController::class, 'store'])
             ->middleware('permission:bills.settle')

@@ -63,6 +63,10 @@
     background-color: #b89f1a;
 }
 
+.admin-table-status-merged {
+    background-color: #8b5cf6;
+}
+
 .admin-table-status-legend {
     display: inline-flex;
     align-items: center;
@@ -414,38 +418,177 @@
     color: #ffffff;
 }
 
+a.edit-kot-save {
+    align-items: center;
+    display: inline-flex;
+    text-decoration: none;
+}
+
+.edit-kot-save:hover:not(:disabled):not(.is-print-blocked) {
+    background: #03284f;
+}
+
+.edit-kot-save:focus-visible {
+    outline: 2px solid #04346a;
+    outline-offset: 2px;
+}
+
 .edit-kot-save:disabled,
-.edit-kot-cancel:disabled {
+.edit-kot-cancel:disabled,
+.edit-kot-save.is-print-blocked {
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.45;
+}
+
+.edit-kot-save.is-print-blocked:hover {
+    background: #04346a;
 }
 
 .edit-kot-actions {
+    align-items: center;
     display: flex;
+    gap: 0.5rem;
     justify-content: flex-end;
     margin-top: 1rem;
 }
 
-.bill-totals {
-    display: grid;
-    gap: 0.6rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.bill-items-table th.num,
+.bill-items-table td.num,
+.bill-summary-table th.num,
+.bill-summary-table td.num {
+    text-align: right;
+}
+
+.bill-summary-table tfoot.bill-summary-foot td {
+    background: #f8fbff;
+    font-weight: 700;
+    border-bottom: 1px solid #e8eef5;
+}
+
+.bill-summary-table tfoot.bill-summary-foot .bill-amount {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.bill-summary-table tfoot.bill-summary-foot .is-grand td {
+    color: #16324f;
+    font-size: 1rem;
+}
+
+.bill-discount-amount {
+    color: #b91c1c;
+}
+
+.bill-discount-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bill-discount-select {
+    border: 1px solid #dfdfdf;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    max-width: 12rem;
+    padding: 0.3rem 0.45rem;
+    width: 75%;
+}
+
+.bill-discount-custom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.bill-discount-custom.hidden {
+    display: none;
+}
+
+.bill-discount-input {
+    border: 1px solid #dfdfdf;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    max-width: 10rem;
+    padding: 0.3rem 0.45rem;
+}
+
+.bill-additional-input {
+    border: 1px solid #dfdfdf;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    max-width: 6.5rem;
+    padding: 0.3rem 0.45rem;
+    text-align: right;
+    width: 100%;
+}
+
+.bill-apply {
+    align-items: center;
+    background: #04346a;
+    border: 1px solid #04346a;
+    border-radius: 999px;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.8rem;
+    font-weight: 700;
+    justify-content: center;
+    line-height: 1.2;
+    min-height: 2rem;
+    padding: 0.4rem 0.85rem;
+    vertical-align: middle;
+}
+
+.bill-apply:hover:not(:disabled) {
+    background: #03284f;
+}
+
+.bill-apply:focus-visible {
+    outline: 2px solid #04346a;
+    outline-offset: 2px;
+}
+
+.bill-apply:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.bill-apply:disabled:hover {
+    background: #04346a;
+}
+
+.bill-discount-error {
+    color: #b91c1c;
+    flex-basis: 100%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.bill-payments-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
     margin-top: 1rem;
 }
 
-.bill-totals dt {
-    color: #898989;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+.bill-payments-meta > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
-.bill-totals dd {
-    color: #1f2f3e;
-    font-size: 0.95rem;
+.bill-payments-meta dt {
+    color: #425466;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.bill-payments-meta dd {
     font-weight: 700;
-    margin: 0.2rem 0 0;
+    margin: 0;
 }
 
 .bill-payments {
@@ -467,8 +610,7 @@
 }
 
 @media (max-width: 640px) {
-    .kot-meta,
-    .bill-totals {
+    .kot-meta {
         grid-template-columns: 1fr;
     }
 }

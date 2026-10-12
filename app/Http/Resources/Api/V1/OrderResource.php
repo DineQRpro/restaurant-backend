@@ -17,6 +17,10 @@ class OrderResource extends JsonResource
             'order_number' => $this->order_number,
             'status' => $this->status instanceof \BackedEnum ? $this->status->value : $this->status,
             'pax' => $this->pax,
+            'allocated_seats' => $this->allocated_seats,
+            'partition_label' => $this->partition_label,
+            'display_label' => $this->tableDisplayName(),
+            'seating_cleaned_at' => $this->seating_cleaned_at?->toIso8601String(),
             'customer' => new CustomerResource($this->whenLoaded('customer')),
             'dine_type' => new DineTypeResource($this->whenLoaded('dineType')),
             'table' => $this->when(

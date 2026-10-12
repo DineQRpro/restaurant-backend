@@ -20,14 +20,6 @@ class KotViewService
 
     public function tableDisplay(Order $order): string
     {
-        if ($order->table?->number) {
-            return $order->table->number;
-        }
-
-        if ($order->dineType && ! $order->dineType->requiresTable()) {
-            return 'Take Away';
-        }
-
-        return $order->dineType?->name ?: 'Take Away';
+        return $order->tableDisplayName();
     }
 }

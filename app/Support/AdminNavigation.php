@@ -61,6 +61,13 @@ class AdminNavigation
                 'match' => 'admin.tables.*',
             ],
             [
+                'label' => 'Discounts',
+                'permission' => 'discounts.view',
+                'available' => true,
+                'route' => 'admin.discounts.index',
+                'match' => 'admin.discounts.*',
+            ],
+            [
                 'label' => 'Orders',
                 'permission' => 'orders.view',
                 'available' => false,
@@ -90,7 +97,9 @@ class AdminNavigation
             [
                 'label' => 'Receipts',
                 'permission' => 'receipts.view',
-                'available' => false,
+                'available' => true,
+                'route' => 'admin.receipts.index',
+                'match' => 'admin.receipts.*',
             ],
             [
                 'label' => 'Settings',

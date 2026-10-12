@@ -24,6 +24,7 @@ class DineTypeFactory extends Factory
             'description' => null,
             'sort_order' => 1,
             'is_active' => true,
+            'requires_full_table' => false,
         ];
     }
 
@@ -40,6 +41,25 @@ class DineTypeFactory extends Factory
         return $this->state([
             'name' => 'Dine In',
             'slug' => 'dine-in',
+            'requires_full_table' => false,
+        ]);
+    }
+
+    public function coupleDine(): static
+    {
+        return $this->state([
+            'name' => 'Couple Dine',
+            'slug' => 'couple-dine',
+            'requires_full_table' => true,
+        ]);
+    }
+
+    public function candleLightDinner(): static
+    {
+        return $this->state([
+            'name' => 'Candle Light Dinner',
+            'slug' => 'candle-light-dinner',
+            'requires_full_table' => true,
         ]);
     }
 

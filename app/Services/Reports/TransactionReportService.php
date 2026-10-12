@@ -36,7 +36,7 @@ class TransactionReportService
     }
 
     /**
-     * @return array{count: int, grand_total: float, discount_total: float, tax_total: float}
+     * @return array{count: int, grand_total: float, discount_total: float, tax_total: float, additional_charges_total: float}
      */
     public function totals(ReportFilters $filters): array
     {
@@ -45,7 +45,8 @@ class TransactionReportService
                 'COUNT(*) AS aggregate_count,
                 COALESCE(SUM(bills.grand_total), 0) AS grand_total,
                 COALESCE(SUM(bills.discount_amount), 0) AS discount_total,
-                COALESCE(SUM(bills.tax_amount), 0) AS tax_total',
+                COALESCE(SUM(bills.tax_amount), 0) AS tax_total,
+                COALESCE(SUM(bills.additional_charges), 0) AS additional_charges_total',
             )
             ->first();
 
@@ -54,6 +55,7 @@ class TransactionReportService
             'grand_total' => round((float) ($row->grand_total ?? 0), 2),
             'discount_total' => round((float) ($row->discount_total ?? 0), 2),
             'tax_total' => round((float) ($row->tax_total ?? 0), 2),
+            'additional_charges_total' => round((float) ($row->additional_charges_total ?? 0), 2),
         ];
     }
 
@@ -79,7 +81,7 @@ class TransactionReportService
                 discounts.name AS discount_name,
                 bills.other_discount_comment,
                 bills.tax_amount AS gst,
-                0 AS additional_charges,
+                bills.additional_charges,
                 bills.grand_total,
                 ".$this->paymentTotals->paymentTypeSql().' AS payment_type,
                 '.$this->paymentTotals->paymentStatusSql().' AS payment_status',

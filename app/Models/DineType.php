@@ -20,6 +20,7 @@ class DineType extends Model
         'description',
         'sort_order',
         'is_active',
+        'requires_full_table',
     ];
 
     protected function casts(): array
@@ -27,12 +28,18 @@ class DineType extends Model
         return [
             'sort_order' => 'integer',
             'is_active' => 'boolean',
+            'requires_full_table' => 'boolean',
         ];
     }
 
     public function requiresTable(): bool
     {
         return $this->slug !== self::SLUG_TAKE_AWAY;
+    }
+
+    public function requiresFullTable(): bool
+    {
+        return (bool) $this->requires_full_table;
     }
 
     public function orders(): HasMany

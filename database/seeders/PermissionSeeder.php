@@ -20,6 +20,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Delete Tables', 'slug' => 'tables.delete'],
             ['name' => 'Merge Tables', 'slug' => 'tables.merge'],
             ['name' => 'Transfer Tables', 'slug' => 'tables.transfer'],
+            ['name' => 'Clean Tables', 'slug' => 'tables.clean'],
 
             // Orders
             ['name' => 'View Orders', 'slug' => 'orders.view'],
@@ -37,6 +38,12 @@ class PermissionSeeder extends Seeder
             ['name' => 'View Bills', 'slug' => 'bills.view'],
             ['name' => 'Create Bills', 'slug' => 'bills.create'],
             ['name' => 'Apply Discounts', 'slug' => 'bills.discount'],
+
+            // Discount master
+            ['name' => 'View Discounts', 'slug' => 'discounts.view'],
+            ['name' => 'Create Discounts', 'slug' => 'discounts.create'],
+            ['name' => 'Update Discounts', 'slug' => 'discounts.update'],
+            ['name' => 'Delete Discounts', 'slug' => 'discounts.delete'],
             ['name' => 'Split Bills', 'slug' => 'bills.split'],
             ['name' => 'Settle Bills', 'slug' => 'bills.settle'],
 
@@ -55,8 +62,10 @@ class PermissionSeeder extends Seeder
             // Reports
             ['name' => 'View Reports', 'slug' => 'reports.view'],
 
-            // Receipts
+            // Receipts (Admin banquet/event documents; independent of bills)
             ['name' => 'View Receipts', 'slug' => 'receipts.view'],
+            ['name' => 'Create Receipts', 'slug' => 'receipts.create'],
+            ['name' => 'Update Receipts', 'slug' => 'receipts.update'],
             ['name' => 'Print Receipts', 'slug' => 'receipts.print'],
         ];
 

@@ -31,6 +31,18 @@ class CheckoutController extends Controller
         ]);
     }
 
+    public function previewOrder(Order $order): JsonResponse
+    {
+        $preview = $this->billingService->previewForOrder($order);
+        $calculation = $preview['calculation'];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Checkout preview generated successfully.',
+            'data' => $this->previewPayload($preview['order'], $preview['table'], $calculation),
+        ]);
+    }
+
     public function store(Order $order): JsonResponse
     {
         $bill = $this->billingService->checkout($order);
@@ -59,7 +71,7 @@ class CheckoutController extends Controller
             ],
             'table' => $table ? [
                 'id' => $table->id,
-                'number' => $table->number,
+                'number' => $order->tableDisplayName(),
                 'status' => $table->status instanceof \BackedEnum ? $table->status->value : $table->status,
             ] : null,
             'subtotal' => number_format($calculation['subtotal'], 2, '.', ''),
