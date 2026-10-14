@@ -30,7 +30,9 @@ class CounterNavigation
             [
                 'label' => 'Orders',
                 'permission' => 'orders.view',
-                'available' => false,
+                'available' => true,
+                'route' => 'counter.takeaway.create',
+                'match' => 'counter.takeaway.*',
             ],
             [
                 'label' => 'Billing',
