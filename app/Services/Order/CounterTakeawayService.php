@@ -6,6 +6,7 @@ use App\Exceptions\BusinessConflictException;
 use App\Models\DineType;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
+use App\Models\MenuType;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\Customer\CustomerService;
@@ -66,6 +67,7 @@ class CounterTakeawayService
         return MenuItem::query()
             ->with('category')
             ->where('is_available', true)
+            ->whereHas('category.menuType', fn ($query) => $query->where('slug', MenuType::SLUG_FOOD))
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
@@ -76,7 +78,10 @@ class CounterTakeawayService
      */
     public function categories(): Collection
     {
-        return MenuCategory::query()->orderBy('name')->get();
+        return MenuCategory::query()
+            ->whereHas('menuType', fn ($query) => $query->where('slug', MenuType::SLUG_FOOD))
+            ->orderBy('name')
+            ->get();
     }
 
     public function addItem(int $menuItemId): void
@@ -233,7 +238,11 @@ class CounterTakeawayService
 
     private function availableItem(int $menuItemId): MenuItem
     {
-        $item = MenuItem::query()->whereKey($menuItemId)->where('is_available', true)->first();
+        $item = MenuItem::query()
+            ->whereKey($menuItemId)
+            ->where('is_available', true)
+            ->whereHas('category.menuType', fn ($query) => $query->where('slug', MenuType::SLUG_FOOD))
+            ->first();
 
         if (! $item) {
             throw new BusinessConflictException('That menu item is not available.');

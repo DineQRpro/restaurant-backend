@@ -9,9 +9,19 @@ class Floor extends Model
 {
     protected $fillable = [
         'name',
+        'code',
+        'description',
         'sort_order',
         'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'sort_order' => 'integer',
+            'is_active' => 'boolean',
+        ];
+    }
 
     public function tables(): HasMany
     {

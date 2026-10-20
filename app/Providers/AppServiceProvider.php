@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Services\LegacyMigration\DestinationBackup;
+use App\Services\LegacyMigration\DestinationRestore;
+use App\Services\LegacyMigration\MysqldumpDestinationBackup;
+use App\Services\LegacyMigration\MysqlDestinationRestore;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -9,7 +13,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->bind(DestinationBackup::class, MysqldumpDestinationBackup::class);
+        $this->app->bind(DestinationRestore::class, MysqlDestinationRestore::class);
     }
 
     public function boot(): void

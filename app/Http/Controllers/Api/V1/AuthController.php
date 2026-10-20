@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\LoginRequest;
+use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -26,6 +27,21 @@ class AuthController extends Controller
                 'user' => new UserResource($result['user']),
                 'token' => $result['token'],
             ],
+        ]);
+    }
+
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $this->authService->changePassword($request->safe()->only([
+            'username',
+            'current_password',
+            'password',
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed. Sign in with the new password.',
+            'data' => null,
         ]);
     }
 

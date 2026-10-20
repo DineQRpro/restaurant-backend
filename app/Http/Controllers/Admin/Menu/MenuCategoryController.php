@@ -9,7 +9,9 @@ use App\Http\Requests\Admin\Menu\StoreMenuCategoryRequest;
 use App\Http\Requests\Admin\Menu\UpdateMenuCategoryRequest;
 use App\Http\Requests\Admin\Menu\UpdateMenuCategoryStatusRequest;
 use App\Models\MenuCategory;
+use App\Models\MenuType;
 use App\Services\Menu\MenuCategoryService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -27,13 +29,16 @@ class MenuCategoryController extends Controller
 
         return view('admin.menu.categories.index', [
             'categories' => $categories,
-            'filters' => $request->only(['search', 'is_active']),
+            'filters' => $request->filters(),
+            'menuTypes' => $this->menuTypes(),
         ]);
     }
 
     public function create(): View
     {
-        return view('admin.menu.categories.create');
+        return view('admin.menu.categories.create', [
+            'menuTypes' => $this->menuTypes(),
+        ]);
     }
 
     public function store(StoreMenuCategoryRequest $request): RedirectResponse
@@ -48,7 +53,8 @@ class MenuCategoryController extends Controller
     public function edit(MenuCategory $category): View
     {
         return view('admin.menu.categories.edit', [
-            'category' => $category,
+            'category' => $category->load('menuType'),
+            'menuTypes' => $this->menuTypes(),
         ]);
     }
 
@@ -113,5 +119,13 @@ class MenuCategoryController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * @return Collection<int, MenuType>
+     */
+    private function menuTypes(): Collection
+    {
+        return MenuType::query()->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get();
     }
 }

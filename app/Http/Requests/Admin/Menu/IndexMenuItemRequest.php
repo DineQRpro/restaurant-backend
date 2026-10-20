@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Menu;
 
 use App\Enums\DietaryType;
+use App\Models\MenuType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,6 +21,7 @@ class IndexMenuItemRequest extends FormRequest
     {
         return [
             'search' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'menu_type' => ['sometimes', 'nullable', 'string', Rule::in([MenuType::SLUG_FOOD, MenuType::SLUG_HOT_BEVERAGES])],
             'category_id' => ['sometimes', 'nullable', 'integer', 'exists:menu_categories,id'],
             'dietary_type' => ['sometimes', 'nullable', Rule::enum(DietaryType::class)],
             'is_available' => ['sometimes', 'nullable', 'in:0,1'],
@@ -32,6 +34,7 @@ class IndexMenuItemRequest extends FormRequest
     /**
      * @return array{
      *     search?: string,
+     *     menu_type: string,
      *     category_id?: int,
      *     dietary_type?: string,
      *     is_available?: bool,
@@ -43,6 +46,10 @@ class IndexMenuItemRequest extends FormRequest
     public function filters(): array
     {
         $filters = $this->validated();
+
+        $filters['menu_type'] = $this->filled('menu_type')
+            ? (string) $this->input('menu_type')
+            : MenuType::SLUG_FOOD;
 
         if (! $this->filled('search')) {
             unset($filters['search']);

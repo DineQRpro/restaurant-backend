@@ -25,6 +25,13 @@ class MenuItemResource extends JsonResource
             'category' => $this->whenLoaded('category', fn () => [
                 'id' => $this->category->id,
                 'name' => $this->category->name,
+                'menu_type' => $this->category->relationLoaded('menuType') && $this->category->menuType
+                    ? [
+                        'id' => $this->category->menuType->id,
+                        'name' => $this->category->menuType->name,
+                        'slug' => $this->category->menuType->slug,
+                    ]
+                    : null,
             ]),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

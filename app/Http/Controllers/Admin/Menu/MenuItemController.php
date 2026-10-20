@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\Menu\UpdateMenuItemRequest;
 use App\Http\Requests\Admin\Menu\UpdateMenuItemStatusRequest;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
+use App\Models\MenuType;
 use App\Services\Menu\MenuItemService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -22,10 +23,16 @@ class MenuItemController extends Controller
 
     public function index(IndexMenuItemRequest $request): View
     {
+        $filters = $request->filters();
+
         return view('admin.menu.items.index', [
-            'items' => $this->menuItemService->paginate($request->filters()),
-            'filters' => $request->only(['search', 'category_id', 'dietary_type', 'is_available', 'is_chef_special']),
-            'categories' => MenuCategory::query()->orderBy('name')->get(),
+            'items' => $this->menuItemService->paginate($filters),
+            'filters' => $filters,
+            'menuTypes' => MenuType::query()->where('is_active', true)->orderBy('sort_order')->get(),
+            'categories' => MenuCategory::query()
+                ->whereHas('menuType', fn ($query) => $query->where('slug', $filters['menu_type']))
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
@@ -104,6 +111,7 @@ class MenuItemController extends Controller
     private function selectableCategories(?MenuItem $item = null): Collection
     {
         return MenuCategory::query()
+            ->with('menuType')
             ->where(function ($query) use ($item) {
                 $query->where('is_active', true);
 

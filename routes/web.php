@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\KotController;
 use App\Http\Controllers\Admin\Menu\MenuCategoryController;
 use App\Http\Controllers\Admin\Menu\MenuItemController;
 use App\Http\Controllers\Admin\OrderBillController;
+use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\ReceiptController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TableController;
@@ -17,7 +18,9 @@ use App\Http\Controllers\Counter\BillPaymentController as CounterBillPaymentCont
 use App\Http\Controllers\Counter\DashboardController as CounterDashboardController;
 use App\Http\Controllers\Counter\KotController as CounterKotController;
 use App\Http\Controllers\Counter\OrderBillController as CounterOrderBillController;
+use App\Http\Controllers\Counter\PasswordController as CounterPasswordController;
 use App\Http\Controllers\Counter\ReportController as CounterReportController;
+use App\Http\Controllers\Counter\TakeawayOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,6 +31,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('/login', [AuthController::class, 'create'])->name('login');
         Route::post('/login', [AuthController::class, 'store']);
+        Route::get('/password', [PasswordController::class, 'create'])->name('password.edit');
+        Route::post('/password', [PasswordController::class, 'store'])->name('password.update');
     });
 
     Route::post('/logout', [AuthController::class, 'destroy'])
@@ -222,6 +227,8 @@ Route::prefix('counter')->name('counter.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('/login', [CounterAuthController::class, 'create'])->name('login');
         Route::post('/login', [CounterAuthController::class, 'store']);
+        Route::get('/password', [CounterPasswordController::class, 'create'])->name('password.edit');
+        Route::post('/password', [CounterPasswordController::class, 'store'])->name('password.update');
     });
 
     Route::post('/logout', [CounterAuthController::class, 'destroy'])
@@ -232,6 +239,22 @@ Route::prefix('counter')->name('counter.')->group(function () {
         Route::middleware('permission:dashboard.view')->group(function () {
             Route::get('/', fn () => redirect()->route('counter.dashboard'));
             Route::get('/dashboard', [CounterDashboardController::class, 'index'])->name('dashboard');
+        });
+
+        Route::middleware('permission:orders.view')->group(function () {
+            Route::get('/order', [TakeawayOrderController::class, 'create'])->name('takeaway.create');
+            Route::post('/order', [TakeawayOrderController::class, 'store'])->name('takeaway.store');
+            Route::get('/menus', [TakeawayOrderController::class, 'menu'])->name('takeaway.menu');
+            Route::post('/menus/{menuItem}', [TakeawayOrderController::class, 'add'])->name('takeaway.menu.add');
+            Route::post('/menus/{menuItem}/increase', [TakeawayOrderController::class, 'increase'])->name('takeaway.menu.increase');
+            Route::post('/menus/{menuItem}/decrease', [TakeawayOrderController::class, 'decrease'])->name('takeaway.menu.decrease');
+            Route::get('/cart', [TakeawayOrderController::class, 'cart'])->name('takeaway.cart');
+            Route::post('/cart/{menuItem}/increase', [TakeawayOrderController::class, 'cartIncrease'])->name('takeaway.cart.increase');
+            Route::post('/cart/{menuItem}/decrease', [TakeawayOrderController::class, 'cartDecrease'])->name('takeaway.cart.decrease');
+            Route::post('/cart/{menuItem}/packing-increase', [TakeawayOrderController::class, 'packingIncrease'])->name('takeaway.cart.packing-increase');
+            Route::post('/cart/{menuItem}/packing-decrease', [TakeawayOrderController::class, 'packingDecrease'])->name('takeaway.cart.packing-decrease');
+            Route::post('/cart/{menuItem}/remove', [TakeawayOrderController::class, 'remove'])->name('takeaway.cart.remove');
+            Route::post('/cart/place', [TakeawayOrderController::class, 'place'])->name('takeaway.place');
         });
 
         Route::get('/orders/{order}/kot', [CounterKotController::class, 'show'])

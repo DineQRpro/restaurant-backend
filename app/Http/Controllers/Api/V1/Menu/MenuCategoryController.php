@@ -43,7 +43,7 @@ class MenuCategoryController extends Controller
 
     public function store(StoreMenuCategoryRequest $request): JsonResponse
     {
-        $category = $this->menuCategoryService->create($request->validated());
+        $category = $this->menuCategoryService->create($request->validated())->load('menuType');
 
         return response()->json([
             'success' => true,
@@ -57,13 +57,13 @@ class MenuCategoryController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Menu category retrieved successfully.',
-            'data' => new MenuCategoryResource($category),
+            'data' => new MenuCategoryResource($category->load('menuType')),
         ]);
     }
 
     public function update(UpdateMenuCategoryRequest $request, MenuCategory $category): JsonResponse
     {
-        $category = $this->menuCategoryService->update($category, $request->validated());
+        $category = $this->menuCategoryService->update($category, $request->validated())->load('menuType');
 
         return response()->json([
             'success' => true,
@@ -82,7 +82,7 @@ class MenuCategoryController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Menu category status updated successfully.',
-            'data' => new MenuCategoryResource($category),
+            'data' => new MenuCategoryResource($category->load('menuType')),
         ]);
     }
 

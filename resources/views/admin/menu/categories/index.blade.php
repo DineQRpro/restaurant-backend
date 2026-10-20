@@ -39,7 +39,7 @@
         </div>
 
         <div class="border-b border-[#eef1f5] px-5 py-4">
-            <form method="GET" action="{{ route('admin.menu.categories.index') }}" class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <form method="GET" action="{{ route('admin.menu.categories.index') }}" class="grid grid-cols-1 gap-3 sm:grid-cols-4">
                 <input
                     type="search"
                     name="search"
@@ -47,6 +47,16 @@
                     placeholder="Search cuisine title or description"
                     class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]"
                 >
+                <select
+                    name="menu_type"
+                    class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]"
+                >
+                    @foreach ($menuTypes as $menuType)
+                        <option value="{{ $menuType->slug }}" @selected(($filters['menu_type'] ?? 'food') === $menuType->slug)>
+                            {{ $menuType->name }}
+                        </option>
+                    @endforeach
+                </select>
                 <select
                     name="is_active"
                     class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]"
@@ -72,6 +82,7 @@
                     <tr>
                         <th class="px-4 py-3 font-semibold">#</th>
                         <th class="px-4 py-3 font-semibold">Image</th>
+                        <th class="px-4 py-3 font-semibold">Menu</th>
                         <th class="px-4 py-3 font-semibold">Title</th>
                         <th class="px-4 py-3 font-semibold">Description</th>
                         <th class="px-4 py-3 font-semibold">Status</th>
@@ -94,6 +105,7 @@
                                     <span class="text-[#898989]">—</span>
                                 @endif
                             </td>
+                            <td class="px-4 py-3 text-[#425466]">{{ $category->menuType?->name ?? '—' }}</td>
                             <td class="px-4 py-3 font-semibold text-[#1f2f3e]">{{ $category->name }}</td>
                             <td class="max-w-xs px-4 py-3 text-[#425466]">{{ $category->description ?: '—' }}</td>
                             <td class="px-4 py-3">
@@ -148,7 +160,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-8 text-center font-semibold text-[#898989]">There is no cuisine</td>
+                            <td colspan="8" class="px-4 py-8 text-center font-semibold text-[#898989]">There is no cuisine</td>
                         </tr>
                     @endforelse
                 </tbody>

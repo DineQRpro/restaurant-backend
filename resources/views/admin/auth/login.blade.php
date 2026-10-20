@@ -16,6 +16,9 @@
 
                 @if ($errors->any())
                     <p class="mb-4 text-sm text-[#dc3545]">{{ $errors->first() }}</p>
+                    @if (str_contains($errors->first(), 'Change your password'))
+                        <a href="{{ route('admin.password.edit') }}" class="mb-4 block text-center text-sm text-[#04346a]">Change password</a>
+                    @endif
                 @endif
 
                 <div class="mb-3">

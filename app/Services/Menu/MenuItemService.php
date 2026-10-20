@@ -10,6 +10,7 @@ class MenuItemService
     /**
      * @param  array{
      *     search?: string,
+     *     menu_type?: string,
      *     category_id?: int,
      *     dietary_type?: string,
      *     is_available?: bool,
@@ -21,7 +22,7 @@ class MenuItemService
      */
     public function paginate(array $filters): LengthAwarePaginator
     {
-        $query = MenuItem::query()->with('category');
+        $query = MenuItem::query()->with(['category.menuType']);
 
         if (! empty($filters['search'])) {
             $search = $filters['search'];
@@ -30,6 +31,14 @@ class MenuItemService
                 $builder->where('name', 'like', '%'.$search.'%')
                     ->orWhere('description', 'like', '%'.$search.'%');
             });
+        }
+
+        if (! empty($filters['menu_type'])) {
+            $menuType = $filters['menu_type'];
+            $query->whereHas(
+                'category.menuType',
+                fn ($builder) => $builder->where('slug', $menuType),
+            );
         }
 
         if (! empty($filters['category_id'])) {
@@ -71,7 +80,7 @@ class MenuItemService
         $data['is_chef_special'] ??= false;
         $data['sort_order'] ??= 0;
 
-        return MenuItem::create($data)->load('category');
+        return MenuItem::create($data)->load('category.menuType');
     }
 
     /**
@@ -81,14 +90,14 @@ class MenuItemService
     {
         $item->update($data);
 
-        return $item->fresh('category');
+        return $item->fresh('category.menuType');
     }
 
     public function updateStatus(MenuItem $item, bool $isAvailable): MenuItem
     {
         $item->update(['is_available' => $isAvailable]);
 
-        return $item->fresh('category');
+        return $item->fresh('category.menuType');
     }
 
     public function delete(MenuItem $item): void

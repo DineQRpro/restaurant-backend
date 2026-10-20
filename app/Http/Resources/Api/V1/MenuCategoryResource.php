@@ -14,6 +14,11 @@ class MenuCategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'menu_type' => $this->whenLoaded('menuType', fn () => [
+                'id' => $this->menuType->id,
+                'name' => $this->menuType->name,
+                'slug' => $this->menuType->slug,
+            ]),
             'name' => $this->name,
             'description' => $this->description,
             'image' => $this->image,

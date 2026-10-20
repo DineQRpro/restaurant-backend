@@ -10,7 +10,11 @@
         $canCreate = $user->hasPermission('menu.create');
         $canUpdate = $user->hasPermission('menu.update');
         $canDelete = $user->hasPermission('menu.delete');
-        $hasFilters = collect($filters)->filter(fn ($value) => $value !== null && $value !== '')->isNotEmpty();
+        $hasFilters = collect($filters)
+            ->except('menu_type')
+            ->filter(fn ($value) => $value !== null && $value !== '')
+            ->isNotEmpty()
+            || (($filters['menu_type'] ?? 'food') !== 'food');
         $spicyLabels = [1 => 'Spicy', 2 => 'Very Spicy'];
     @endphp
 
@@ -41,7 +45,7 @@
         </div>
 
         <div class="border-b border-[#eef1f5] px-5 py-4">
-            <form method="GET" action="{{ route('admin.menu.items.index') }}" class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-6">
+            <form method="GET" action="{{ route('admin.menu.items.index') }}" class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-7">
                 <input
                     type="search"
                     name="search"
@@ -49,6 +53,13 @@
                     placeholder="Search menu name"
                     class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a] xl:col-span-2"
                 >
+                <select name="menu_type" class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]">
+                    @foreach ($menuTypes as $menuType)
+                        <option value="{{ $menuType->slug }}" @selected(($filters['menu_type'] ?? 'food') === $menuType->slug)>
+                            {{ $menuType->name }}
+                        </option>
+                    @endforeach
+                </select>
                 <select name="category_id" class="w-full rounded-md border border-[#dfdfdf] px-3 py-2 text-sm outline-none focus:border-[#04346a]">
                     <option value="">All cuisines</option>
                     @foreach ($categories as $category)

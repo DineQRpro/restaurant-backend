@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\MenuCategoryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuCategory extends Model
@@ -13,6 +14,7 @@ class MenuCategory extends Model
     use HasFactory;
 
     protected $fillable = [
+        'menu_type_id',
         'name',
         'description',
         'image',
@@ -23,9 +25,15 @@ class MenuCategory extends Model
     protected function casts(): array
     {
         return [
+            'menu_type_id' => 'integer',
             'sort_order' => 'integer',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function menuType(): BelongsTo
+    {
+        return $this->belongsTo(MenuType::class);
     }
 
     public function items(): HasMany

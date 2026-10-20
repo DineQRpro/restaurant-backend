@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1\Menu;
 
 use App\Enums\DietaryType;
+use App\Models\MenuType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,6 +21,7 @@ class IndexMenuItemRequest extends FormRequest
     {
         return [
             'search' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'menu_type' => ['sometimes', 'nullable', 'string', Rule::in([MenuType::SLUG_FOOD, MenuType::SLUG_HOT_BEVERAGES])],
             'category_id' => ['sometimes', 'nullable', 'integer', 'exists:menu_categories,id'],
             'dietary_type' => ['sometimes', 'nullable', Rule::enum(DietaryType::class)],
             'is_available' => ['sometimes', 'boolean'],

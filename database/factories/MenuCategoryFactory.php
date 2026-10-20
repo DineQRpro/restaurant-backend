@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\MenuCategory;
+use App\Models\MenuType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,6 +17,10 @@ class MenuCategoryFactory extends Factory
     public function definition(): array
     {
         return [
+            'menu_type_id' => MenuType::query()->firstOrCreate(
+                ['slug' => MenuType::SLUG_FOOD],
+                ['name' => 'Food Menu', 'sort_order' => 1, 'is_active' => true],
+            )->id,
             'name' => fake()->unique()->words(2, true),
             'description' => fake()->optional()->sentence(),
             'image' => null,

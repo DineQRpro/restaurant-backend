@@ -11,6 +11,7 @@ class MenuCategoryService
     /**
      * @param  array{
      *     search?: string,
+     *     menu_type?: string,
      *     is_active?: bool,
      *     sort?: string,
      *     order?: string,
@@ -19,7 +20,7 @@ class MenuCategoryService
      */
     public function paginate(array $filters): LengthAwarePaginator
     {
-        $query = MenuCategory::query();
+        $query = MenuCategory::query()->with('menuType');
 
         if (! empty($filters['search'])) {
             $search = $filters['search'];
@@ -28,6 +29,11 @@ class MenuCategoryService
                 $builder->where('name', 'like', '%'.$search.'%')
                     ->orWhere('description', 'like', '%'.$search.'%');
             });
+        }
+
+        if (! empty($filters['menu_type'])) {
+            $menuType = $filters['menu_type'];
+            $query->whereHas('menuType', fn ($builder) => $builder->where('slug', $menuType));
         }
 
         if (array_key_exists('is_active', $filters)) {
@@ -56,7 +62,7 @@ class MenuCategoryService
         $data['is_active'] ??= true;
         $data['sort_order'] ??= 0;
 
-        return MenuCategory::create($data);
+        return MenuCategory::create($data)->load('menuType');
     }
 
     /**
@@ -66,14 +72,14 @@ class MenuCategoryService
     {
         $category->update($data);
 
-        return $category->fresh();
+        return $category->fresh('menuType');
     }
 
     public function updateStatus(MenuCategory $category, bool $isActive): MenuCategory
     {
         $category->update(['is_active' => $isActive]);
 
-        return $category->fresh();
+        return $category->fresh('menuType');
     }
 
     public function delete(MenuCategory $category): void

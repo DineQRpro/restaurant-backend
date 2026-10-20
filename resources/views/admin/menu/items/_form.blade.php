@@ -46,10 +46,14 @@
             class="w-full rounded-md border border-[#dfdfdf] px-3 py-2.5 text-sm outline-none focus:border-[#04346a] @error('category_id') border-red-400 @enderror"
         >
             <option value="">Choose...</option>
-            @foreach ($categories as $category)
-                <option value="{{ $category->id }}" @selected((string) old('category_id', $item?->category_id) === (string) $category->id)>
-                    {{ $category->name }}{{ $category->is_active ? '' : ' (inactive)' }}
-                </option>
+            @foreach ($categories->groupBy(fn ($category) => $category->menuType?->name ?? 'Menu') as $menuName => $group)
+                <optgroup label="{{ $menuName }}">
+                    @foreach ($group as $category)
+                        <option value="{{ $category->id }}" @selected((string) old('category_id', $item?->category_id) === (string) $category->id)>
+                            {{ $category->name }}{{ $category->is_active ? '' : ' (inactive)' }}
+                        </option>
+                    @endforeach
+                </optgroup>
             @endforeach
         </select>
         @error('category_id')

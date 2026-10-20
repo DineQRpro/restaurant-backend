@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Menu;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreMenuCategoryRequest extends FormRequest
 {
@@ -24,6 +25,11 @@ class StoreMenuCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'menu_type_id' => [
+                'required',
+                'integer',
+                Rule::exists('menu_types', 'id')->where('is_active', true),
+            ],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],

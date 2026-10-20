@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin\Menu;
 
+use App\Models\MenuType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class IndexMenuCategoryRequest extends FormRequest
 {
@@ -18,6 +20,7 @@ class IndexMenuCategoryRequest extends FormRequest
     {
         return [
             'search' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'menu_type' => ['sometimes', 'nullable', 'string', Rule::in([MenuType::SLUG_FOOD, MenuType::SLUG_HOT_BEVERAGES])],
             'is_active' => ['sometimes', 'nullable', 'in:0,1'],
             'sort' => ['sometimes', 'nullable', 'string', 'in:name,sort_order,is_active,created_at'],
             'order' => ['sometimes', 'nullable', 'string', 'in:asc,desc'],
@@ -27,6 +30,7 @@ class IndexMenuCategoryRequest extends FormRequest
     /**
      * @return array{
      *     search?: string,
+     *     menu_type: string,
      *     is_active?: bool,
      *     sort?: string,
      *     order?: string
@@ -35,6 +39,10 @@ class IndexMenuCategoryRequest extends FormRequest
     public function filters(): array
     {
         $filters = $this->validated();
+
+        $filters['menu_type'] = $this->filled('menu_type')
+            ? (string) $this->input('menu_type')
+            : MenuType::SLUG_FOOD;
 
         if (! $this->filled('search')) {
             unset($filters['search']);

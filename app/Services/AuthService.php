@@ -38,6 +38,43 @@ class AuthService
     }
 
     /**
+     * @param  array{username: string, current_password: string, password: string}  $credentials
+     *
+     * @throws ValidationException
+     */
+    public function changePassword(array $credentials): User
+    {
+        $user = $this->authenticate([
+            'username' => $credentials['username'],
+            'password' => $credentials['current_password'],
+        ]);
+
+        if (! $user->must_change_password) {
+            throw ValidationException::withMessages([
+                'password' => ['This account does not require a password change.'],
+            ]);
+        }
+
+        $user->password = $credentials['password'];
+        $user->must_change_password = false;
+        $user->save();
+
+        return $user;
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function ensurePasswordIsCurrent(User $user): void
+    {
+        if ($user->must_change_password) {
+            throw ValidationException::withMessages([
+                'password' => ['Change your password before signing in.'],
+            ]);
+        }
+    }
+
+    /**
      * Authenticate user by username/password and return a Sanctum token.
      *
      * @param  array{username: string, password: string}  $credentials
@@ -48,6 +85,7 @@ class AuthService
     public function login(array $credentials): array
     {
         $user = $this->authenticate($credentials);
+        $this->ensurePasswordIsCurrent($user);
 
         $token = $user->createToken('auth-token')->plainTextToken;
 

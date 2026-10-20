@@ -5,6 +5,28 @@
 
 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
     <div>
+        <label for="menu_type_id" class="mb-1.5 block text-sm font-semibold text-[#1f2f3e]">
+            Menu Type <span class="text-red-600">*</span>
+        </label>
+        <select
+            id="menu_type_id"
+            name="menu_type_id"
+            required
+            class="w-full rounded-md border border-[#dfdfdf] px-3 py-2.5 text-sm outline-none focus:border-[#04346a] @error('menu_type_id') border-red-400 @enderror"
+        >
+            <option value="">Choose...</option>
+            @foreach ($menuTypes as $menuType)
+                <option value="{{ $menuType->id }}" @selected((string) old('menu_type_id', $category?->menu_type_id) === (string) $menuType->id)>
+                    {{ $menuType->name }}
+                </option>
+            @endforeach
+        </select>
+        @error('menu_type_id')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div>
         <label for="name" class="mb-1.5 block text-sm font-semibold text-[#1f2f3e]">
             Cuisine Title <span class="text-red-600">*</span>
         </label>

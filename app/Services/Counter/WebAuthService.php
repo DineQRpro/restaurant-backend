@@ -47,6 +47,8 @@ class WebAuthService
             ]);
         }
 
+        $this->authService->ensurePasswordIsCurrent($user);
+
         Auth::login($user, $remember);
 
         return $user;
