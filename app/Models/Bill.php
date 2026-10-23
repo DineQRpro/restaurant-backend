@@ -68,4 +68,9 @@ class Bill extends Model
     {
         return $this->status === BillStatus::Open;
     }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === BillStatus::Cancelled;
+    }
 }

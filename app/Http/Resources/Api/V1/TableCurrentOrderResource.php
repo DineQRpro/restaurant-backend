@@ -18,7 +18,11 @@ class TableCurrentOrderResource extends JsonResource
             'pax' => $this->pax,
             'total' => number_format($this->itemsTotal(), 2, '.', ''),
             'started_at' => $this->started_at?->toIso8601String(),
-            'customer' => new CustomerResource($this->whenLoaded('customer')),
+            'historical_customer_name' => $this->historical_customer_name,
+            'customer' => $this->when(
+                $this->relationLoaded('customer'),
+                fn () => $this->customer ? new CustomerResource($this->customer) : null,
+            ),
             'dine_type' => new DineTypeResource($this->whenLoaded('dineType')),
         ];
     }

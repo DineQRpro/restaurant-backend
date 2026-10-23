@@ -122,6 +122,7 @@ class TableResource extends JsonResource
                 'pax' => $order->pax,
                 'allocated_seats' => $occupancy->allocatedSeats($order),
                 'state' => $state,
+                'historical_customer_name' => $order->historical_customer_name,
                 'customer' => $customer ? [
                     'id' => $customer->id,
                     'name' => $customer->name,

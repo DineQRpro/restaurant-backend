@@ -27,7 +27,7 @@ class ImportVerifier
             $this->check('categories', MenuCategory::query()->count(), (int) ($tables['tbl_category']['imported'] ?? 0)),
             $this->check('items', MenuItem::query()->count(), (int) ($tables['tbl_products']['imported'] ?? 0)),
             $this->check('tables', Table::query()->count(), (int) ($tables['tbl_tables']['imported'] ?? 0)),
-            $this->check('users', User::query()->count(), (int) ($tables['tbl_users']['imported'] ?? 0)),
+            $this->check('users', User::query()->count(), (int) ($tables['tbl_users']['imported'] ?? 0) + User::query()->where('username', 'legacy-unassigned')->count()),
             $this->check('inactive discounts', Discount::query()->where('is_active', false)->count(), (int) ($tables['tbl_discounts']['imported'] ?? 0)),
             $this->check('active discounts', Discount::query()->where('is_active', true)->count(), 0),
             $this->check('hot beverage categories', $hotId === null ? 0 : MenuCategory::query()->where('menu_type_id', $hotId)->count(), 0),
@@ -37,7 +37,13 @@ class ImportVerifier
             })->count(), 0),
             $this->check('items without a category', MenuItem::query()->whereDoesntHave('category')->count(), 0),
             $this->check('category id maps', LegacyMigrationIdMap::query()->where('source_table', 'tbl_category')->count(), (int) ($tables['tbl_category']['imported'] ?? 0)),
-            $this->check('payment methods', PaymentMethod::query()->count(), 5),
+            $this->check('payment methods', PaymentMethod::query()->count(), 6),
+            $this->check('inactive credit method', PaymentMethod::query()->where('slug', PaymentMethod::SLUG_CREDIT)->where('is_active', false)->count(), 1),
+            $this->check('placed historical orders', \App\Models\Order::query()->where('status', 'placed')->count(), 0),
+            $this->check('orders', \App\Models\Order::query()->count(), (int) ($tables['tbl_order']['imported'] ?? 0)),
+            $this->check('order items', \App\Models\OrderItem::query()->count(), (int) ($tables['tbl_order_items']['imported'] ?? 0)),
+            $this->check('bills', \App\Models\Bill::query()->count(), (int) ($tables['tbl_bill']['imported'] ?? 0)),
+            $this->check('receipts', \App\Models\Receipt::query()->count(), (int) ($tables['tbl_receipts']['imported'] ?? 0)),
             $this->check('ground floor', Floor::query()->whereKey(1)->where('code', 'ground-floor')->count(), 1),
         ];
 

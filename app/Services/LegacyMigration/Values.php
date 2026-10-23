@@ -62,6 +62,16 @@ class Values
         }
     }
 
+    public static function money(mixed $value): string
+    {
+        return number_format((float) ($value ?? 0), 2, '.', '');
+    }
+
+    public static function cents(mixed $value): int
+    {
+        return (int) round(((float) self::money($value)) * 100);
+    }
+
     public static function phone(mixed $value): ?string
     {
         $text = self::text($value);

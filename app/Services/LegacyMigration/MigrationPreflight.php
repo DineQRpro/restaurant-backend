@@ -17,6 +17,12 @@ class MigrationPreflight
         'tbl_products',
         'tbl_tables',
         'tbl_discounts',
+        'tbl_order',
+        'tbl_order_items',
+        'tbl_bill',
+        'tbl_bill_payments',
+        'tbl_receipts',
+        'tbl_receipt_items',
     ];
 
     public function __construct(private readonly LegacySource $source) {}

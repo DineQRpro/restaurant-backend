@@ -3,6 +3,7 @@
 namespace App\Services\LegacyMigration\Migrators;
 
 use App\Enums\TableOperationalStatus;
+use App\Models\LegacyMigrationIdMap;
 use App\Models\Table;
 use App\Services\LegacyMigration\FloorResolver;
 use App\Services\LegacyMigration\LegacySource;
@@ -56,6 +57,24 @@ class TableMigrator extends Migrator
         foreach (Table::query()->pluck('number') as $number) {
             $context->claim($context->tableNumbers, (string) $number);
         }
+
+        LegacyMigrationIdMap::query()
+            ->where('source_table', 'tbl_tables')
+            ->get()
+            ->each(function (LegacyMigrationIdMap $map) use ($context): void {
+                $tbid = $map->metadata['tbl_tbid'] ?? null;
+
+                if (! is_string($tbid) || $tbid === '') {
+                    return;
+                }
+
+                $context->physicalTableByTbid[$tbid] = (int) $map->destination_id;
+                $number = Table::query()->whereKey($map->destination_id)->value('number');
+
+                if (is_string($number) && $number !== '') {
+                    $context->physicalTableNumberByTbid[$tbid] = $number;
+                }
+            });
     }
 
     protected function constrain(Builder $query): void
@@ -84,9 +103,15 @@ class TableMigrator extends Migrator
             throw RowRejected::failed('Table number already exists.');
         }
 
+        $tbid = Values::nullableText($row->tbl_tbid ?? null);
         $metadata = [
-            'tbl_tbid' => Values::nullableText($row->tbl_tbid ?? null),
+            'tbl_tbid' => $tbid,
         ];
+
+        if ($tbid !== null) {
+            $context->physicalTableByTbid[$tbid] = true;
+            $context->physicalTableNumberByTbid[$tbid] = $number;
+        }
 
         if (! $context->persist) {
             $this->remember($context, $sourceId, null, $metadata);
@@ -107,6 +132,10 @@ class TableMigrator extends Migrator
         $table->created_at = $createdAt;
         $table->updated_at = $updatedAt;
         $table->save();
+
+        if ($tbid !== null) {
+            $context->physicalTableByTbid[$tbid] = $table->id;
+        }
 
         $this->remember($context, $sourceId, $table->id, $metadata);
     }

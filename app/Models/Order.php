@@ -15,6 +15,7 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'customer_id',
+        'historical_customer_name',
         'dine_type_id',
         'table_id',
         'waiter_id',
@@ -51,6 +52,19 @@ class Order extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function displayCustomerName(): ?string
+    {
+        $historical = trim((string) $this->historical_customer_name);
+
+        if ($historical !== '') {
+            return $historical;
+        }
+
+        $name = trim((string) ($this->customer?->name ?? ''));
+
+        return $name === '' ? null : $name;
     }
 
     public function dineType(): BelongsTo

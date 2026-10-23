@@ -21,7 +21,11 @@ class OrderResource extends JsonResource
             'partition_label' => $this->partition_label,
             'display_label' => $this->tableDisplayName(),
             'seating_cleaned_at' => $this->seating_cleaned_at?->toIso8601String(),
-            'customer' => new CustomerResource($this->whenLoaded('customer')),
+            'historical_customer_name' => $this->historical_customer_name,
+            'customer' => $this->when(
+                $this->relationLoaded('customer'),
+                fn () => $this->customer ? new CustomerResource($this->customer) : null,
+            ),
             'dine_type' => new DineTypeResource($this->whenLoaded('dineType')),
             'table' => $this->when(
                 $this->relationLoaded('table'),

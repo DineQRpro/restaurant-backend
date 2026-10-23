@@ -23,6 +23,8 @@ class PaymentMethod extends Model
 
     public const SLUG_NON_CHARGEABLE = 'non-chargeable';
 
+    public const SLUG_CREDIT = 'credit';
+
     protected $fillable = [
         'name',
         'slug',

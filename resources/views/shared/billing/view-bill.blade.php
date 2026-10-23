@@ -33,10 +33,10 @@
             <dt>Date/Time</dt>
             <dd>{{ $issuedAt }}</dd>
         </div>
-        @if ($order->customer?->name)
+        @if ($order->displayCustomerName())
             <div>
                 <dt>Customer</dt>
-                <dd>{{ $order->customer->name }}</dd>
+                <dd>{{ $order->displayCustomerName() }}</dd>
             </div>
         @endif
         <div>

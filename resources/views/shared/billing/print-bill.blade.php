@@ -54,7 +54,7 @@
         @endif
 
         <div class="print-bill-row">
-            <div class="print-bill-first">Customer: {{ $order->customer?->name }}</div>
+            <div class="print-bill-first">Customer: {{ $order->displayCustomerName() }}</div>
             <div>Mobile: {{ $maskedPhone }}</div>
         </div>
 

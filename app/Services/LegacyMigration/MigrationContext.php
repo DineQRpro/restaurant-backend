@@ -37,6 +37,20 @@ class MigrationContext
 
     public bool $freshDestination = false;
 
+    /**
+     * Physical legacy tbl_tbid values resolved to a destination table id.
+     * Dry-runs store true when the physical table is eligible.
+     *
+     * @var array<string, int|true>
+     */
+    public array $physicalTableByTbid = [];
+
+    /** @var array<string, string> */
+    public array $physicalTableNumberByTbid = [];
+
+    /** @var array<string, mixed> */
+    public array $transactionSummary = [];
+
     public function __construct(
         public readonly LegacyMigrationRun $run,
         public readonly bool $persist,

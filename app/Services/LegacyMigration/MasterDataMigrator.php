@@ -25,6 +25,7 @@ class MasterDataMigrator
         private readonly TableMigrator $tables,
         private readonly DiscountMigrator $discounts,
         private readonly PaymentMethodMigrator $payments,
+        private readonly TransactionMigrator $transactions,
         private readonly SourceAnalyzer $analyzer,
     ) {}
 
@@ -66,6 +67,7 @@ class MasterDataMigrator
         }
 
         $this->payments->migrate($context);
+        $this->transactions->migrate($context);
 
         return $this->finish($run, $context, $source, $persist);
     }
@@ -234,6 +236,7 @@ class MasterDataMigrator
                 'floor' => $context->floorMessage,
                 'discount_statuses' => $this->discounts->statuses,
                 'payment_methods_mapped' => $paymentMapped,
+                'transactions' => $context->transactionSummary,
                 'unresolved_decisions' => $context->floorBlocked && $context->floorMessage
                     ? [$context->floorMessage]
                     : [],

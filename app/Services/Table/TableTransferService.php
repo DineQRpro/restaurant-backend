@@ -420,7 +420,7 @@ class TableTransferService
                 return [
                     'partition_label' => $party->partition_label,
                     'display_label' => $party->tableDisplayName(),
-                    'customer_name' => $party->customer?->name,
+                    'customer_name' => $party->displayCustomerName(),
                     'pax' => (int) $party->pax,
                     'allocated_seats' => $this->occupancy->allocatedSeats($party),
                 ];
@@ -456,7 +456,7 @@ class TableTransferService
                     'table_number' => $table->number,
                     'partition_label' => $party->partition_label,
                     'display_label' => $party->tableDisplayName(),
-                    'customer_name' => $party->customer?->name,
+                    'customer_name' => $party->displayCustomerName(),
                     'pax' => (int) $party->pax,
                     'allocated_seats' => $this->occupancy->allocatedSeats($party),
                     'available_seats' => $occupancy->availableSeats,

@@ -33,9 +33,10 @@ class PaymentMethodMigrator extends Migrator
         $codes = [
             '1' => PaymentMethod::SLUG_CASH,
             '2' => PaymentMethod::SLUG_UPI,
-            '3' => PaymentMethod::SLUG_CARD,
-            '4' => PaymentMethod::SLUG_SPLIT,
-            '5' => PaymentMethod::SLUG_NON_CHARGEABLE,
+            '3' => PaymentMethod::SLUG_SPLIT,
+            '4' => PaymentMethod::SLUG_NON_CHARGEABLE,
+            '5' => PaymentMethod::SLUG_CARD,
+            '6' => PaymentMethod::SLUG_CREDIT,
         ];
 
         foreach ($codes as $code => $slug) {
@@ -57,6 +58,8 @@ class PaymentMethodMigrator extends Migrator
             $context->imported($this->sourceTable());
             $this->record($code, 'approved', 'Legacy code '.$code.' reuses '.$slug.' ('.$method->id.').');
         }
+
+        $this->record('7', 'approved', 'Legacy code 7 is cancellation, not a payment method.');
     }
 
     protected function import(MigrationContext $context, object $row, string $sourceId): void {}

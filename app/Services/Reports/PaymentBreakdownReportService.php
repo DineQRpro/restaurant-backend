@@ -11,6 +11,7 @@ class PaymentBreakdownReportService
     public function __construct(
         private readonly ReportQuery $query,
         private readonly ReportDateRange $dates,
+        private readonly BillPaymentTotals $paymentTotals,
     ) {}
 
     /**
@@ -55,9 +56,9 @@ class PaymentBreakdownReportService
             'cash_value' => $this->sumMoney($rows, 'cash_value'),
             'upi_value' => $this->sumMoney($rows, 'upi_value'),
             'card_value' => $this->sumMoney($rows, 'card_value'),
-            'credit_value' => 0.0,
+            'credit_value' => $this->sumMoney($rows, 'credit_value'),
             'nc_value' => $this->sumMoney($rows, 'nc_value'),
-            'cancel_value' => 0.0,
+            'cancel_value' => $this->sumMoney($rows, 'cancel_value'),
             'net_sales' => $this->sumMoney($rows, 'net_sales'),
         ];
     }
@@ -112,9 +113,9 @@ class PaymentBreakdownReportService
             'cash_value' => $this->sumMoney($rows, 'cash_value'),
             'upi_value' => $this->sumMoney($rows, 'upi_value'),
             'card_value' => $this->sumMoney($rows, 'card_value'),
-            'credit_value' => 0.0,
+            'credit_value' => $this->sumMoney($rows, 'credit_value'),
             'nc_value' => $this->sumMoney($rows, 'nc_value'),
-            'cancel_value' => 0.0,
+            'cancel_value' => $this->sumMoney($rows, 'cancel_value'),
             'net_sales' => $this->sumMoney($rows, 'net_sales'),
         ];
     }
@@ -137,19 +138,16 @@ class PaymentBreakdownReportService
             COUNT(DISTINCT bills.id) AS total_bills,
             COUNT(DISTINCT orders.id) AS total_orders,
             COALESCE(SUM(bills.grand_total), 0) AS order_value,
-            COALESCE(SUM(payment_totals.cash_amount), 0) AS cash_value,
-            COALESCE(SUM(payment_totals.upi_amount), 0) AS upi_value,
-            COALESCE(SUM(payment_totals.card_amount), 0) AS card_value,
-            0 AS credit_value,
-            COALESCE(SUM(payment_totals.nc_amount), 0) AS nc_value,
-            0 AS cancel_value,
+            COALESCE(SUM(CASE WHEN bills.status = 'cancelled' THEN 0 ELSE payment_totals.cash_amount END), 0) AS cash_value,
+            COALESCE(SUM(CASE WHEN bills.status = 'cancelled' THEN 0 ELSE payment_totals.upi_amount END), 0) AS upi_value,
+            COALESCE(SUM(CASE WHEN bills.status = 'cancelled' THEN 0 ELSE payment_totals.card_amount END), 0) AS card_value,
+            COALESCE(SUM(CASE WHEN bills.status = 'cancelled' THEN 0 ELSE payment_totals.credit_amount END), 0) AS credit_value,
+            COALESCE(SUM(CASE WHEN bills.status = 'cancelled' THEN 0 ELSE payment_totals.nc_amount END), 0) AS nc_value,
+            COALESCE(SUM(CASE WHEN bills.status = 'cancelled' THEN bills.grand_total ELSE 0 END), 0) AS cancel_value,
             COALESCE(SUM(
                 CASE
-                    WHEN COALESCE(payment_totals.nc_amount, 0) > 0
-                        AND COALESCE(payment_totals.cash_amount, 0) = 0
-                        AND COALESCE(payment_totals.upi_amount, 0) = 0
-                        AND COALESCE(payment_totals.card_amount, 0) = 0
-                    THEN 0
+                    WHEN bills.status = 'cancelled' THEN 0
+                    WHEN {$this->paymentTotals->ncOnlySql()} THEN 0
                     ELSE bills.grand_total
                 END
             ), 0) AS net_sales

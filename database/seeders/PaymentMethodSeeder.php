@@ -61,5 +61,15 @@ class PaymentMethodSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        PaymentMethod::updateOrCreate(
+            ['slug' => PaymentMethod::SLUG_CREDIT],
+            [
+                'name' => 'Credit',
+                'description' => 'Historical credit tender. Not offered for new settlements.',
+                'sort_order' => 6,
+                'is_active' => false,
+            ]
+        );
     }
 }

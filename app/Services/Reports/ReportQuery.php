@@ -68,19 +68,15 @@ class ReportQuery
     {
         return match ($filters->billStatus) {
             'paid' => $query->where('bills.status', 'settled')
-                ->whereRaw('NOT (
-                    COALESCE(payment_totals.nc_amount, 0) > 0
-                    AND COALESCE(payment_totals.cash_amount, 0) = 0
-                    AND COALESCE(payment_totals.upi_amount, 0) = 0
-                    AND COALESCE(payment_totals.card_amount, 0) = 0
-                )'),
+                ->whereRaw('NOT ('.$this->paymentTotals->ncOnlySql().')')
+                ->whereRaw('NOT ('.$this->paymentTotals->creditOnlySql().')'),
             'unpaid' => $query->where('bills.status', 'open')
-                ->whereRaw('COALESCE(payment_totals.nc_amount, 0) = 0'),
-            'non_chargeable' => $query->where('payment_totals.nc_amount', '>', 0)
-                ->whereRaw('COALESCE(payment_totals.cash_amount, 0) = 0')
-                ->whereRaw('COALESCE(payment_totals.upi_amount, 0) = 0')
-                ->whereRaw('COALESCE(payment_totals.card_amount, 0) = 0'),
-            'credit', 'cancel' => $query->whereRaw('1 = 0'),
+                ->whereRaw('NOT ('.$this->paymentTotals->ncOnlySql().')')
+                ->whereRaw('NOT ('.$this->paymentTotals->creditOnlySql().')'),
+            'non_chargeable' => $query->whereRaw($this->paymentTotals->ncOnlySql()),
+            'credit' => $query->where('bills.status', '!=', 'cancelled')
+                ->whereRaw($this->paymentTotals->creditOnlySql()),
+            'cancel' => $query->where('bills.status', 'cancelled'),
             default => $query,
         };
     }

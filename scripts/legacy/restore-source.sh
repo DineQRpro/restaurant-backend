@@ -183,7 +183,7 @@ else
   mysql_exec "$incoming" < "$dump"
 fi
 
-required=(tbl_users tbl_category tbl_products tbl_tables tbl_discounts)
+required=(tbl_users tbl_category tbl_products tbl_tables tbl_discounts tbl_order tbl_order_items tbl_bill tbl_bill_payments tbl_receipts tbl_receipt_items)
 for table in "${required[@]}"; do
   count="$(mysql_exec -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${incoming}' AND table_name='${table}'")"
   if [[ "$count" != "1" ]]; then

@@ -98,6 +98,7 @@ class OrderItemController extends Controller
                 'joined_into_order_id' => $order->joined_into_order_id,
                 'joined_into_order_number' => $order->joinedInto?->order_number,
                 'joined_into_table_id' => $order->joinedInto?->table_id,
+                'historical_customer_name' => $order->historical_customer_name,
                 'customer' => $order->customer
                     ? (new CustomerResource($order->customer))->resolve()
                     : null,
