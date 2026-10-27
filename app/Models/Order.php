@@ -290,10 +290,13 @@ class Order extends Model
                             ->where(function (Builder $query) use ($todayStart): void {
                                 $query->whereDoesntHave('bills')
                                     ->orWhereHas('bills', function (Builder $bills) use ($todayStart): void {
-                                        $bills->where('status', BillStatus::Open)
-                                            ->orWhere(function (Builder $bills) use ($todayStart): void {
-                                                $bills->where('status', BillStatus::Settled)
-                                                    ->where('settled_at', '>=', $todayStart);
+                                        $bills->whereNull('historical_pay_method')
+                                            ->where(function (Builder $bills) use ($todayStart): void {
+                                                $bills->where('status', BillStatus::Open)
+                                                    ->orWhere(function (Builder $bills) use ($todayStart): void {
+                                                        $bills->where('status', BillStatus::Settled)
+                                                            ->where('settled_at', '>=', $todayStart);
+                                                    });
                                             });
                                     });
                             });

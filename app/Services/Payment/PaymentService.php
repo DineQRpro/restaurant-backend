@@ -162,6 +162,9 @@ class PaymentService
     {
         return round((float) BillPayment::query()
             ->whereDate('paid_at', now()->toDateString())
+            ->whereHas('bill', function ($query): void {
+                $query->whereNull('historical_pay_method');
+            })
             ->sum('amount'), 2);
     }
 
@@ -170,7 +173,7 @@ class PaymentService
         /** @var Bill $bill */
         $bill = Bill::query()->whereKey($bill->id)->lockForUpdate()->firstOrFail();
 
-        if ($bill->status !== BillStatus::Open) {
+        if ($bill->historical_pay_method !== null || $bill->status !== BillStatus::Open) {
             throw new BusinessConflictException('This bill is not open for payment.');
         }
 

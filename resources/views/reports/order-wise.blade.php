@@ -45,7 +45,7 @@
                             <td class="text-right">{{ $row->total_quantity }}</td>
                             <td class="text-right">{{ number_format((float) $row->packing_charges, 2) }}</td>
                             <td class="text-right">{{ $row->pax }}</td>
-                            <td class="text-right">{{ number_format((float) $row->pax_average, 2) }}</td>
+                            <td class="text-right">{{ $row->pax_average === null ? '' : number_format((float) $row->pax_average, 2) }}</td>
                         </tr>
                     @empty
                         <tr>

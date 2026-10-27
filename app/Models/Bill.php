@@ -23,6 +23,8 @@ class Bill extends Model
         'round_off',
         'grand_total',
         'status',
+        'historical_pay_method',
+        'historical_pay_status',
         'issued_at',
         'settled_at',
     ];
@@ -39,6 +41,8 @@ class Bill extends Model
             'round_off' => 'decimal:2',
             'grand_total' => 'decimal:2',
             'status' => BillStatus::class,
+            'historical_pay_method' => 'integer',
+            'historical_pay_status' => 'integer',
             'issued_at' => 'datetime',
             'settled_at' => 'datetime',
         ];
@@ -66,7 +70,8 @@ class Bill extends Model
 
     public function isPayable(): bool
     {
-        return $this->status === BillStatus::Open;
+        return $this->historical_pay_method === null
+            && $this->status === BillStatus::Open;
     }
 
     public function isCancelled(): bool

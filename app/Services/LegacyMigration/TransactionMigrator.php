@@ -322,8 +322,7 @@ class TransactionMigrator
             $customerId = $phone !== null ? ($customers[$phone] ?? null) : null;
             $customerId = is_int($customerId) ? $customerId : null;
             $historical = Values::nullableText($occupation->tables_customer_name ?? null);
-            $pax = (int) ($occupation->tables_reserved_chair ?? 0);
-            $pax = $pax >= 1 && $pax <= 255 ? $pax : 1;
+            $pax = $this->chairCount($occupation->tables_chair_numbers ?? null);
             $created = Values::timestamp($order->order_created_at, 'Created at');
             $updated = Values::timestamp($order->order_updated_at, 'Updated at');
             $cancelled = $status !== 7 || isset($cancelOrderIds[(int) $order->order_id]);
@@ -350,7 +349,7 @@ class TransactionMigrator
                 'table_id' => $tableId,
                 'waiter_id' => $waiterId,
                 'pax' => $pax,
-                'allocated_seats' => $pax,
+                'allocated_seats' => $pax !== null && $pax >= 1 && $pax <= 255 ? $pax : null,
                 'merged_tables' => $this->mergedTables($context, $order->tbls_merged ?? null),
                 'status' => OrderStatus::Checkout,
                 'started_at' => $created,
@@ -564,8 +563,9 @@ class TransactionMigrator
             }
 
             $method = (int) ($bill->bill_pay_method ?? 0);
+            $payStatus = $bill->bill_pay_status;
+            $historicalStatus = $payStatus === null || $payStatus === '' ? null : (int) $payStatus;
             $grand = Values::money($bill->bill_gd_total ?? 0);
-            $paid = 0;
             $latestPaidAt = null;
 
             foreach ($paymentsByBill[(int) $bill->bill_id] ?? [] as $payment) {
@@ -579,7 +579,6 @@ class TransactionMigrator
                     continue;
                 }
 
-                $paid += Values::cents($payment->payment_amount);
                 $stamp = trim((string) ($payment->paid_at ?? ''));
 
                 if ($stamp !== '' && ($latestPaidAt === null || $stamp > $latestPaidAt)) {
@@ -587,8 +586,9 @@ class TransactionMigrator
                 }
             }
 
-            $cancelled = $method === 7;
-            $settled = ! $cancelled && $paid === Values::cents($grand);
+            $issued = Values::timestamp($bill->bill_created_at, 'Issued at');
+            $updated = Values::timestamp($bill->bill_updated_at, 'Updated at');
+            $status = $this->historicalBillStatus($method, $historicalStatus);
             $discountSource = (int) ($bill->discount_id ?? 0);
             $discountId = null;
 
@@ -603,10 +603,6 @@ class TransactionMigrator
                     continue;
                 }
             }
-
-            $issued = Values::timestamp($bill->bill_created_at, 'Issued at');
-            $updated = Values::timestamp($bill->bill_updated_at, 'Updated at');
-            $status = $cancelled ? BillStatus::Cancelled : ($settled ? BillStatus::Settled : BillStatus::Open);
 
             if (! $context->persist) {
                 $context->imported('tbl_bill');
@@ -635,8 +631,10 @@ class TransactionMigrator
                 'round_off' => Values::money($bill->round_off ?? 0),
                 'grand_total' => $grand,
                 'status' => $status,
+                'historical_pay_method' => $method,
+                'historical_pay_status' => $historicalStatus,
                 'issued_at' => $issued,
-                'settled_at' => $settled ? Values::timestamp($latestPaidAt ?? $bill->bill_updated_at, 'Settled at') : null,
+                'settled_at' => $status === BillStatus::Settled ? Values::timestamp($latestPaidAt ?? $bill->bill_updated_at, 'Settled at') : null,
             ]);
             $record->timestamps = false;
             $record->created_at = $issued;
@@ -1017,6 +1015,36 @@ class TransactionMigrator
         }
 
         return $snapshots === [] ? null : $snapshots;
+    }
+
+    private function historicalBillStatus(int $method, ?int $payStatus): BillStatus
+    {
+        if ($method === 7 || $payStatus === 4) {
+            return BillStatus::Cancelled;
+        }
+
+        if ($method === 4 || $payStatus === 3 || $method === 6 || $payStatus === 2) {
+            return BillStatus::Open;
+        }
+
+        if ($payStatus === 1) {
+            return BillStatus::Settled;
+        }
+
+        return BillStatus::Open;
+    }
+
+    private function chairCount(mixed $value): ?int
+    {
+        $text = Values::text($value);
+
+        if (preg_match('/^-?\d+$/', $text) !== 1) {
+            return null;
+        }
+
+        $count = (int) $text;
+
+        return $count >= -32768 && $count <= 32767 ? $count : null;
     }
 
     private function phone(mixed $value): ?string

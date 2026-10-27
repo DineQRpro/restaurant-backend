@@ -67,18 +67,45 @@ class ReportQuery
     public function applyBillStatusFilter(Builder $query, ReportFilters $filters): Builder
     {
         return match ($filters->billStatus) {
-            'paid' => $query->where('bills.status', 'settled')
-                ->whereRaw('NOT ('.$this->paymentTotals->ncOnlySql().')')
-                ->whereRaw('NOT ('.$this->paymentTotals->creditOnlySql().')'),
-            'unpaid' => $query->where('bills.status', 'open')
-                ->whereRaw('NOT ('.$this->paymentTotals->ncOnlySql().')')
-                ->whereRaw('NOT ('.$this->paymentTotals->creditOnlySql().')'),
-            'non_chargeable' => $query->whereRaw($this->paymentTotals->ncOnlySql()),
-            'credit' => $query->where('bills.status', '!=', 'cancelled')
-                ->whereRaw($this->paymentTotals->creditOnlySql()),
-            'cancel' => $query->where('bills.status', 'cancelled'),
+            'paid' => $this->historicalOrCurrentStatus($query, 'Paid', function (Builder $query): Builder {
+                return $query->where('bills.status', 'settled')
+                    ->whereRaw('NOT ('.$this->paymentTotals->ncOnlySql().')')
+                    ->whereRaw('NOT ('.$this->paymentTotals->creditOnlySql().')');
+            }),
+            'unpaid' => $this->historicalOrCurrentStatus($query, 'Unpaid', function (Builder $query): Builder {
+                return $query->where('bills.status', 'open')
+                    ->whereRaw('NOT ('.$this->paymentTotals->ncOnlySql().')')
+                    ->whereRaw('NOT ('.$this->paymentTotals->creditOnlySql().')');
+            }),
+            'non_chargeable' => $this->historicalOrCurrentStatus($query, 'Non Chargeable', function (Builder $query): Builder {
+                return $query->whereRaw($this->paymentTotals->ncOnlySql());
+            }),
+            'credit' => $this->historicalOrCurrentStatus($query, 'Credit', function (Builder $query): Builder {
+                return $query->where('bills.status', '!=', 'cancelled')
+                    ->whereRaw($this->paymentTotals->creditOnlySql());
+            }),
+            'cancel' => $this->historicalOrCurrentStatus($query, 'Cancel', function (Builder $query): Builder {
+                return $query->where('bills.status', 'cancelled');
+            }),
             default => $query,
         };
+    }
+
+    /**
+     * @param  callable(Builder): Builder  $current
+     */
+    private function historicalOrCurrentStatus(Builder $query, string $label, callable $current): Builder
+    {
+        $historical = $this->paymentTotals->historicalPaymentStatusSql();
+
+        return $query->where(function (Builder $query) use ($historical, $label, $current): void {
+            $query->where(function (Builder $query) use ($historical, $label): void {
+                $query->whereNotNull('bills.historical_pay_method')
+                    ->whereRaw("({$historical}) = ?", [$label]);
+            })->orWhere(function (Builder $query) use ($current): void {
+                $current($query->whereNull('bills.historical_pay_method'));
+            });
+        });
     }
 
     public function joinPaymentTotals(Builder $query): Builder

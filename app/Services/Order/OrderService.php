@@ -102,6 +102,7 @@ class OrderService
     {
         return Bill::query()
             ->where('status', BillStatus::Open)
+            ->whereNull('historical_pay_method')
             ->whereHas('order', function ($query) use ($tableId): void {
                 $query->where('table_id', $tableId);
             })

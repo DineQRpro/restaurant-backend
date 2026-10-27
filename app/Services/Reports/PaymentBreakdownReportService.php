@@ -147,6 +147,7 @@ class PaymentBreakdownReportService
             COALESCE(SUM(
                 CASE
                     WHEN bills.status = 'cancelled' THEN 0
+                    WHEN bills.historical_pay_method = 4 OR bills.historical_pay_status = 3 THEN 0
                     WHEN {$this->paymentTotals->ncOnlySql()} THEN 0
                     ELSE bills.grand_total
                 END

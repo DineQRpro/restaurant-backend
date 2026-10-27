@@ -60,7 +60,8 @@ class OrderWiseReportService
 
     private function baseQuery(ReportFilters $filters): Builder
     {
-        $timestamp = $this->dates->billTimestampSql('bills');
+        $historical = 'bills.historical_pay_method IS NOT NULL';
+        $timestamp = "CASE WHEN {$historical} THEN COALESCE(orders.started_at, orders.created_at) ELSE ".$this->dates->billTimestampSql('bills').' END';
 
         $query = DB::table('bills')
             ->leftJoin('orders', 'orders.id', '=', 'bills.order_id')
@@ -75,7 +76,7 @@ class OrderWiseReportService
             );
 
         $this->query->joinPaymentTotals($query);
-        $this->query->applyBillDateFilter($query, $filters);
+        $this->applyReportDateFilter($query, $filters, $timestamp);
         $this->query->applyBillNoFilter($query, $filters);
         $this->query->applyOrderTypeFilter($query, $filters);
 
@@ -86,17 +87,36 @@ class OrderWiseReportService
                 bills.bill_number,
                 COALESCE(dine_types.name, '-') AS order_type,
                 ".$this->paymentTotals->paymentTypeSql().' AS payment_mode,
-                bills.grand_total AS bill_summary,
+                CASE WHEN '.$historical.' THEN bills.subtotal ELSE bills.grand_total END AS bill_summary,
                 COALESCE(item_stats.product_count, 0) AS product_count,
                 COALESCE(item_stats.total_quantity, 0) AS total_quantity,
                 COALESCE(item_stats.packing_charges, 0) AS packing_charges,
-                COALESCE(orders.pax, 0) AS pax,
+                orders.pax AS pax,
                 CASE
+                    WHEN '.$historical.' AND orders.pax IS NOT NULL AND orders.pax <> 0
+                        THEN ROUND((bills.subtotal * 1.0) / orders.pax, 2)
+                    WHEN '.$historical.' THEN NULL
                     WHEN COALESCE(orders.pax, 0) = 0 THEN 0
                     ELSE ROUND(bills.grand_total / orders.pax, 2)
                 END AS pax_average,
                 tables.number AS table_number',
             )
             ->orderByDesc('bills.id');
+    }
+
+    /**
+     * Legacy new_order_wise_report filters tbl_order.order_created_at.
+     * A new Laravel bill keeps the bill timestamp.
+     */
+    private function applyReportDateFilter(Builder $query, ReportFilters $filters, string $timestamp): void
+    {
+        if (! $filters->hasDateRange()) {
+            return;
+        }
+
+        $query->whereRaw(
+            "{$timestamp} >= ? AND {$timestamp} <= ?",
+            [$filters->from->format('Y-m-d H:i:s'), $filters->to->format('Y-m-d H:i:s')],
+        );
     }
 }

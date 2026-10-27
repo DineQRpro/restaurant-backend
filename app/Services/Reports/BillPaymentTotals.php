@@ -63,13 +63,15 @@ class BillPaymentTotals
     }
 
     /**
-     * SQL CASE matching VarsityKitchen payment-type labels, mapped onto Laravel
-     * bill_payments and bill status.
+     * SQL CASE matching VarsityKitchen payment-type labels.
+     * Historical bills use tbl_bill.bill_pay_method and bill_pay_status.
+     * A new Laravel bill is classified from its payment rows.
      */
     public function paymentTypeSql(): string
     {
         return "
             CASE
+                WHEN bills.historical_pay_method IS NOT NULL THEN {$this->historicalPaymentTypeSql()}
                 WHEN bills.status = 'cancelled' THEN 'Cancel'
                 WHEN {$this->ncOnlySql()} THEN 'Non Chargeable'
                 WHEN {$this->creditOnlySql()} THEN 'Credit'
@@ -84,14 +86,50 @@ class BillPaymentTotals
         ";
     }
 
+    /**
+     * Varsity bill-status report order:
+     * method 4 or status 3, then method 6 or status 2, then method 7 or status 4,
+     * then status 1, otherwise Unpaid. Payment totals are not consulted.
+     */
     public function paymentStatusSql(): string
     {
         return "
             CASE
+                WHEN bills.historical_pay_method IS NOT NULL THEN {$this->historicalPaymentStatusSql()}
                 WHEN bills.status = 'cancelled' THEN 'Cancel'
                 WHEN {$this->ncOnlySql()} THEN 'Non Chargeable'
                 WHEN {$this->creditOnlySql()} THEN 'Credit'
                 WHEN bills.status = 'settled' THEN 'Paid'
+                ELSE 'Unpaid'
+            END
+        ";
+    }
+
+    public function historicalPaymentTypeSql(): string
+    {
+        return "
+            CASE
+                WHEN bills.historical_pay_method = 4 OR bills.historical_pay_status = 3 THEN 'Non Chargeable'
+                WHEN bills.historical_pay_method = 6 OR bills.historical_pay_status = 2 THEN 'Credit'
+                WHEN bills.historical_pay_method = 7 OR bills.historical_pay_status = 4 THEN 'Cancel'
+                WHEN bills.historical_pay_method = 1 THEN 'Cash'
+                WHEN bills.historical_pay_method = 2 THEN 'UPI'
+                WHEN bills.historical_pay_method = 3 THEN 'Split'
+                WHEN bills.historical_pay_method = 5 THEN 'Card'
+                WHEN bills.historical_pay_status = 1 THEN 'Paid'
+                ELSE 'Unpaid'
+            END
+        ";
+    }
+
+    public function historicalPaymentStatusSql(): string
+    {
+        return "
+            CASE
+                WHEN bills.historical_pay_method = 4 OR bills.historical_pay_status = 3 THEN 'Non Chargeable'
+                WHEN bills.historical_pay_method = 6 OR bills.historical_pay_status = 2 THEN 'Credit'
+                WHEN bills.historical_pay_method = 7 OR bills.historical_pay_status = 4 THEN 'Cancel'
+                WHEN bills.historical_pay_status = 1 THEN 'Paid'
                 ELSE 'Unpaid'
             END
         ";

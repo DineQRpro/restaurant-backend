@@ -247,7 +247,7 @@ class BillingService
 
     private function assertAdjustmentsMutable(Bill $bill): void
     {
-        if ($bill->status !== BillStatus::Open) {
+        if ($bill->historical_pay_method !== null || $bill->status !== BillStatus::Open) {
             throw new BusinessConflictException('This bill can no longer be adjusted.');
         }
 

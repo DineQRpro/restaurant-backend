@@ -55,6 +55,7 @@ class BillViewService
     public function canApplyAdjustments(Bill $bill, User $user): bool
     {
         return $user->hasPermission('bills.discount')
+            && $bill->historical_pay_method === null
             && $bill->status === BillStatus::Open
             && $bill->payments->isEmpty();
     }

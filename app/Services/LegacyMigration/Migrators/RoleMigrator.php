@@ -37,9 +37,9 @@ class RoleMigrator extends Migrator
     {
         $definitions = [
             1 => ['action' => 'map', 'slug' => 'admin', 'note' => 'Legacy admin uses the existing admin role.'],
-            2 => ['action' => 'skip', 'message' => 'Kitchen users are excluded.', 'note' => 'D1. Kitchen is skipped.'],
-            3 => ['action' => 'map', 'slug' => 'counter', 'note' => 'Legacy counter uses the existing counter role.'],
-            4 => ['action' => 'map', 'slug' => 'waiter', 'note' => 'D2. Staff maps to the existing waiter role.'],
+            2 => ['action' => 'map', 'slug' => 'waiter', 'note' => 'Legacy kitchen uses the existing waiter role.'],
+            3 => ['action' => 'map', 'slug' => 'waiter', 'note' => 'Legacy counter uses the existing waiter role.'],
+            4 => ['action' => 'map', 'slug' => 'waiter', 'note' => 'Legacy staff uses the existing waiter role.'],
             5 => ['action' => 'skip', 'message' => 'Store users are excluded.', 'note' => 'D3. Store is skipped.'],
         ];
 
