@@ -29,6 +29,25 @@ There is no Repository layer.
 
 ---
 
+## 1a. Menu types
+
+Table: `menu_types`
+
+| Column | Type | Notes |
+| ------ | ---- | ----- |
+| `id` | bigint PK | |
+| `name` | varchar, unique | `Food Menu`, `Hot Beverages Menu` |
+| `slug` | varchar, unique | `food`, `hot-beverages` |
+| `sort_order` | unsigned int | |
+| `is_active` | boolean | |
+| `created_at` / `updated_at` | timestamps | |
+
+`menu_categories.menu_type_id` references `menu_types.id`. An item's menu type comes from its category. `menu_items` has no `menu_type_id`.
+
+The migration inserts both slugs. Existing categories are assigned to `food` before the column is required.
+
+Admin category and item lists default to `food`. API list endpoints accept an optional `menu_type` slug. Omitting it returns every type.
+
 ## 2. Category structure
 
 Table: `menu_categories`
@@ -36,6 +55,7 @@ Table: `menu_categories`
 | Column | Type | Notes |
 | ------ | ---- | ----- |
 | `id` | bigint PK | |
+| `menu_type_id` | FK → `menu_types.id` | Required. `restrictOnDelete`. |
 | `name` | varchar(255) | Required. Not unique (legacy cuisine names were not unique). |
 | `description` | text, nullable | |
 | `image` | varchar(255), nullable | Path/filename string. File upload is not part of this API. |
@@ -46,6 +66,8 @@ Table: `menu_categories`
 Relationship:
 
 ```text
+MenuType hasMany MenuCategory  (categories())
+MenuCategory belongsTo MenuType  (menuType())
 MenuCategory hasMany MenuItem  (items())
 ```
 
@@ -73,6 +95,7 @@ Relationship:
 
 ```text
 MenuItem belongsTo MenuCategory  (category())
+MenuItem hasOneThrough MenuType  (menuType())
 ```
 
 There is **no** `main_category_id` foreign key and **no** `mainCategory()` relationship. See section 10.

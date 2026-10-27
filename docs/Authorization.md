@@ -56,6 +56,7 @@ users.delete
 * `tables.delete`
 * `tables.merge`
 * `tables.transfer`
+* `tables.clean`
 
 ### Orders
 
@@ -73,11 +74,18 @@ users.delete
 
 ### Billing
 
-* `bills.view`
+* `bills.view` (also authorizes Admin/Counter Print Bill)
 * `bills.create`
 * `bills.discount`
 * `bills.split`
 * `bills.settle`
+
+### Discounts
+
+* `discounts.view`
+* `discounts.create`
+* `discounts.update`
+* `discounts.delete`
 
 ### Menu
 
@@ -99,8 +107,14 @@ users.delete
 
 ### Receipts
 
+Admin banquet/event receipt documents (`tbl_receipts` in VarsityKitchen). These are **not** dine-in bill prints.
+
 * `receipts.view`
+* `receipts.create`
+* `receipts.update`
 * `receipts.print`
+
+Receipt Management lives only in the Admin Blade portal (`/admin/receipts`). Counter keeps `receipts.view` / `receipts.print` from the original permission map, but the Counter sidebar item stays unavailable and `admin.area` blocks Counter from the Admin module. Waiter and Captain are not assigned these create/update slugs.
 
 ---
 
@@ -108,11 +122,13 @@ users.delete
 
 ### Waiter
 
-`dashboard.view`, `menu.view`, `tables.view`, `tables.update`, `tables.transfer`, `orders.view`, `orders.create`, `orders.update`, `orders.item_status`, `kot.view`, `kot.create`
+`dashboard.view`, `menu.view`, `tables.view`, `tables.update`, `tables.transfer`, `tables.clean`, `tables.merge`, `orders.view`, `orders.create`, `orders.update`, `orders.item_status`, `kot.view`, `kot.create`
+
+Waiter receives `tables.merge` so the Floor Merge / Un-Merge action can run from the order status popup. Counter does not.
 
 ### Captain
 
-`dashboard.view`, `menu.view`, `tables.view`, `tables.update`, `tables.merge`, `tables.transfer`, `orders.view`, `orders.create`, `orders.update`, `orders.cancel`, `orders.item_status`, `kot.view`, `kot.create`, `kot.update`, `bills.view`
+`dashboard.view`, `menu.view`, `tables.view`, `tables.update`, `tables.merge`, `tables.transfer`, `tables.clean`, `orders.view`, `orders.create`, `orders.update`, `orders.cancel`, `orders.item_status`, `kot.view`, `kot.create`, `kot.update`, `bills.view`
 
 ### Counter
 
