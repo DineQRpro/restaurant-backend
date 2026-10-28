@@ -272,40 +272,92 @@ class Order extends Model
     public const PAID_VISIBILITY_MINUTES = 5;
 
     /**
-     * Current operational orders for the Counter and Admin Track Orders boards.
+     * Orders shown on the Counter and Admin Track Orders boards.
      *
-     * Placed orders and checkout orders with an open bill stay visible.
-     * A settled bill stays only until five minutes after bills.settled_at,
-     * the moment payment completed. Older paid orders, cancelled orders,
-     * and historical imported bills are excluded. Nothing is deleted.
+     * The order date is COALESCE(started_at, created_at), the same timestamp
+     * reports use for the order. It must fall on today's calendar date in
+     * config('app.timezone'). Payment date is not the order date.
+     *
+     * An order stays visible when it is unpaid, or when its bill is settled
+     * and bills.settled_at is still inside the last five minutes. At exactly
+     * five minutes it leaves the board. Cancelled orders, credit-only bills,
+     * non-chargeable-only bills, and historical imported bills are excluded.
+     * Nothing is deleted.
      *
      * @param  Builder<Order>  $query
      * @return Builder<Order>
      */
     public function scopeOperational(Builder $query): Builder
     {
+        $dayStart = self::businessDayStart();
+        $dayEnd = $dayStart->copy()->addDay();
         $paidSince = now()->subMinutes(self::PAID_VISIBILITY_MINUTES);
 
         return $query
             ->whereNull('cancelled_at')
             ->whereNull('joined_into_order_id')
+            ->whereRaw('COALESCE(started_at, created_at) >= ? AND COALESCE(started_at, created_at) < ?', [
+                $dayStart->format('Y-m-d H:i:s'),
+                $dayEnd->format('Y-m-d H:i:s'),
+            ])
             ->where(function (Builder $query) use ($paidSince): void {
-                $query->where('status', OrderStatus::Placed)
-                    ->orWhere(function (Builder $query) use ($paidSince): void {
-                        $query->where('status', OrderStatus::Checkout)
-                            ->where(function (Builder $query) use ($paidSince): void {
-                                $query->whereDoesntHave('bills')
-                                    ->orWhereHas('bills', function (Builder $bills) use ($paidSince): void {
-                                        $bills->whereNull('historical_pay_method')
-                                            ->where(function (Builder $bills) use ($paidSince): void {
-                                                $bills->where('status', BillStatus::Open)
-                                                    ->orWhere(function (Builder $bills) use ($paidSince): void {
-                                                        $bills->where('status', BillStatus::Settled)
-                                                            ->where('settled_at', '>', $paidSince);
-                                                    });
-                                            });
-                                    });
-                            });
+                $query->where(function (Builder $query) use ($paidSince): void {
+                    $query->where('status', OrderStatus::Placed)
+                        ->where(function (Builder $query) use ($paidSince): void {
+                            $query->whereDoesntHave('bills')
+                                ->orWhereHas('bills', function (Builder $bills) use ($paidSince): void {
+                                    self::constrainActiveBill($bills, $paidSince);
+                                });
+                        });
+                })->orWhere(function (Builder $query) use ($paidSince): void {
+                    $query->where('status', OrderStatus::Checkout)
+                        ->where(function (Builder $query) use ($paidSince): void {
+                            $query->whereDoesntHave('bills')
+                                ->orWhereHas('bills', function (Builder $bills) use ($paidSince): void {
+                                    self::constrainActiveBill($bills, $paidSince);
+                                });
+                        });
+                });
+            });
+    }
+
+    /**
+     * Midnight of the current business date, expressed in the timezone used
+     * to store order timestamps.
+     */
+    private static function businessDayStart(): \Illuminate\Support\Carbon
+    {
+        $businessTimezone = (string) config('app.timezone');
+
+        return now()
+            ->timezone($businessTimezone)
+            ->startOfDay()
+            ->timezone(date_default_timezone_get());
+    }
+
+    /**
+     * A live bill is active when it is open and unpaid, or settled inside the
+     * five-minute window, and it is not a credit-only or non-chargeable-only bill.
+     *
+     * @param  Builder<\App\Models\Bill>  $bills
+     */
+    private static function constrainActiveBill(Builder $bills, \Illuminate\Support\Carbon $paidSince): void
+    {
+        $bills->whereNull('historical_pay_method')
+            ->where(function (Builder $bills): void {
+                $bills->whereDoesntHave('payments')
+                    ->orWhereHas('payments.paymentMethod', function (Builder $method): void {
+                        $method->whereNotIn('slug', [
+                            PaymentMethod::SLUG_CREDIT,
+                            PaymentMethod::SLUG_NON_CHARGEABLE,
+                        ]);
+                    });
+            })
+            ->where(function (Builder $bills) use ($paidSince): void {
+                $bills->where('status', BillStatus::Open)
+                    ->orWhere(function (Builder $bills) use ($paidSince): void {
+                        $bills->where('status', BillStatus::Settled)
+                            ->where('settled_at', '>', $paidSince);
                     });
             });
     }

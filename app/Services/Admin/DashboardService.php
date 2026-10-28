@@ -87,6 +87,7 @@ class DashboardService
 
         $amountReceived = $this->paymentService->amountReceivedToday();
         $paymentMethods = $this->activePaymentMethods();
+        $trackOrders = $this->trackOrders();
 
         return [
             'date' => now()->timezone(config('app.timezone'))->format('D d, Y'),
@@ -103,7 +104,7 @@ class DashboardService
                 ],
                 [
                     'label' => 'Total Pending Orders',
-                    'value' => (int) $orderCounts->get(OrderStatus::Placed->value, 0),
+                    'value' => $trackOrders->count(),
                     'placeholder' => null,
                 ],
                 [
@@ -141,7 +142,7 @@ class DashboardService
                 ],
                 TableOperationalStatus::cases(),
             ),
-            'track_orders' => $this->trackOrders(),
+            'track_orders' => $trackOrders,
             'payment_methods' => $paymentMethods,
             'splittable_payment_methods' => $paymentMethods
                 ->filter(fn (PaymentMethod $method): bool => $method->isSplittable())

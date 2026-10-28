@@ -216,9 +216,11 @@ class PaymentService
         $newPaidTotal = $this->paidTotal($bill);
 
         if ($newPaidTotal >= round((float) $bill->grand_total, 2)) {
+            $becomingPaid = $bill->status !== BillStatus::Settled;
+
             $bill->update([
                 'status' => BillStatus::Settled,
-                'settled_at' => $bill->settled_at ?? now(),
+                'settled_at' => $becomingPaid ? now() : ($bill->settled_at ?? now()),
             ]);
         }
     }
