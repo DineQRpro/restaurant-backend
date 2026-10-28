@@ -267,35 +267,41 @@ class Order extends Model
     }
 
     /**
-     * Current operational orders for the Admin Track Orders board.
+     * Minutes a fully paid order stays on the Track Orders board after payment.
+     */
+    public const PAID_VISIBILITY_MINUTES = 5;
+
+    /**
+     * Current operational orders for the Counter and Admin Track Orders boards.
      *
-     * Includes placed orders and checkout orders that still have an open bill
-     * or a bill settled today. Historical checkout orders settled before today
-     * are excluded.
+     * Placed orders and checkout orders with an open bill stay visible.
+     * A settled bill stays only until five minutes after bills.settled_at,
+     * the moment payment completed. Older paid orders, cancelled orders,
+     * and historical imported bills are excluded. Nothing is deleted.
      *
      * @param  Builder<Order>  $query
      * @return Builder<Order>
      */
     public function scopeOperational(Builder $query): Builder
     {
-        $todayStart = now()->startOfDay();
+        $paidSince = now()->subMinutes(self::PAID_VISIBILITY_MINUTES);
 
         return $query
             ->whereNull('cancelled_at')
             ->whereNull('joined_into_order_id')
-            ->where(function (Builder $query) use ($todayStart): void {
+            ->where(function (Builder $query) use ($paidSince): void {
                 $query->where('status', OrderStatus::Placed)
-                    ->orWhere(function (Builder $query) use ($todayStart): void {
+                    ->orWhere(function (Builder $query) use ($paidSince): void {
                         $query->where('status', OrderStatus::Checkout)
-                            ->where(function (Builder $query) use ($todayStart): void {
+                            ->where(function (Builder $query) use ($paidSince): void {
                                 $query->whereDoesntHave('bills')
-                                    ->orWhereHas('bills', function (Builder $bills) use ($todayStart): void {
+                                    ->orWhereHas('bills', function (Builder $bills) use ($paidSince): void {
                                         $bills->whereNull('historical_pay_method')
-                                            ->where(function (Builder $bills) use ($todayStart): void {
+                                            ->where(function (Builder $bills) use ($paidSince): void {
                                                 $bills->where('status', BillStatus::Open)
-                                                    ->orWhere(function (Builder $bills) use ($todayStart): void {
+                                                    ->orWhere(function (Builder $bills) use ($paidSince): void {
                                                         $bills->where('status', BillStatus::Settled)
-                                                            ->where('settled_at', '>=', $todayStart);
+                                                            ->where('settled_at', '>', $paidSince);
                                                     });
                                             });
                                     });

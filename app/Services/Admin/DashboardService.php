@@ -223,6 +223,9 @@ class DashboardService
                 'payment_status' => $paymentStatus['value'],
                 'payment_status_label' => $paymentStatus['label'],
                 'payment_status_css' => $paymentStatus['css'],
+                'hide_at' => $bill?->status === BillStatus::Settled && $bill->settled_at
+                    ? $bill->settled_at->copy()->addMinutes(Order::PAID_VISIBILITY_MINUTES)->toIso8601String()
+                    : null,
             ];
         });
     }

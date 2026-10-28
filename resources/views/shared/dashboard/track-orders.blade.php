@@ -31,7 +31,7 @@
         </thead>
         <tbody>
             @forelse ($dashboard['track_orders'] as $row)
-                <tr class="order-row" data-order-number="{{ $row['order_number'] }}">
+                <tr class="order-row" data-order-number="{{ $row['order_number'] }}" @if (! empty($row['hide_at'])) data-hide-at="{{ $row['hide_at'] }}" @endif>
                     <td data-label="Order#">
                         <span class="order-id-chip">{{ $row['order_number'] }}</span>
                     </td>
@@ -149,3 +149,33 @@
         </tbody>
     </table>
 </div>
+
+@once
+    @push('scripts')
+        <script>
+            (() => {
+                const removeExpiredPaidOrders = () => {
+                    document.querySelectorAll('[data-hide-at]').forEach((row) => {
+                        const hideAt = Date.parse(row.getAttribute('data-hide-at') || '');
+                        if (Number.isFinite(hideAt) && Date.now() >= hideAt) {
+                            row.remove();
+                        }
+                    });
+                };
+
+                removeExpiredPaidOrders();
+                document.querySelectorAll('[data-hide-at]').forEach((row) => {
+                    const hideAt = Date.parse(row.getAttribute('data-hide-at') || '');
+                    if (! Number.isFinite(hideAt)) {
+                        return;
+                    }
+                    const delay = hideAt - Date.now();
+                    if (delay > 0 && delay < 10 * 60 * 1000) {
+                        window.setTimeout(removeExpiredPaidOrders, delay + 50);
+                    }
+                });
+                window.setInterval(removeExpiredPaidOrders, 15000);
+            })();
+        </script>
+    @endpush
+@endonce

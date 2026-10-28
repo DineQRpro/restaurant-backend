@@ -218,7 +218,7 @@ class PaymentService
         if ($newPaidTotal >= round((float) $bill->grand_total, 2)) {
             $bill->update([
                 'status' => BillStatus::Settled,
-                'settled_at' => now(),
+                'settled_at' => $bill->settled_at ?? now(),
             ]);
         }
     }
