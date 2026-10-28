@@ -11,6 +11,17 @@ class StartTakeawayOrderRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $name = trim((string) $this->input('customer_name', ''));
+        $mobile = preg_replace('/\s+/', '', (string) $this->input('mobile_number', '')) ?? '';
+
+        $this->merge([
+            'customer_name' => $name === '' ? null : $name,
+            'mobile_number' => $mobile === '' ? null : $mobile,
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -18,8 +29,8 @@ class StartTakeawayOrderRequest extends FormRequest
     {
         return [
             'order_type' => ['required', 'in:take-away'],
-            'customer_name' => ['required', 'string', 'max:150'],
-            'mobile_number' => ['required', 'string', 'regex:/^[6-9][0-9]{9}$/'],
+            'customer_name' => ['nullable', 'string', 'max:150'],
+            'mobile_number' => ['nullable', 'string', 'regex:/^[6-9][0-9]{9}$/'],
         ];
     }
 

@@ -71,17 +71,17 @@
 
         @foreach ($bill->items as $item)
             @php
-                $lineAmount = (float) $item->unit_price * $item->quantity;
+                $qty = max(1, (int) $item->quantity);
+                $basePrice = (float) $item->unit_price;
+                $packingFee = (float) $item->packing_fee;
+                $lineAmount = app(\App\Services\Billing\BillCalculationService::class)->lineAmount($basePrice, $qty, $packingFee);
             @endphp
             <div class="print-bill-item">
                 <div class="print-bill-col-item">
                     {{ $item->item_name }}
-                    @if ((float) $item->packing_fee != 0.0)
-                        <span class="print-bill-packing">Pk {{ number_format((float) $item->packing_fee, 2) }}</span>
-                    @endif
                 </div>
                 <div class="print-bill-col-qty">{{ $item->quantity }}</div>
-                <div class="print-bill-col-rate">{{ number_format((float) $item->unit_price, 2) }}</div>
+                <div class="print-bill-col-rate">{{ number_format($basePrice, 2) }}</div>
                 <div class="print-bill-col-amt">{{ number_format($lineAmount, 2) }}</div>
             </div>
         @endforeach

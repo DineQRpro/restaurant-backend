@@ -36,9 +36,9 @@
                 @enderror
             </div>
         </div>
-        <div class="mt-6 flex justify-end gap-2">
-            <a href="{{ route('counter.dashboard') }}" class="rounded border border-slate-300 px-4 py-2">Cancel</a>
-            <button class="rounded bg-indigo-600 px-4 py-2 text-white">Submit Order</button>
+        <div class="mt-6 flex flex-wrap justify-end gap-2">
+            <a href="{{ route('counter.dashboard') }}" class="takeaway-btn takeaway-btn-light bg-white text-[#1f2f3e]">Cancel</a>
+            <button type="submit" class="takeaway-btn takeaway-btn-primary bg-[#04346a] text-white">Submit Order</button>
         </div>
     </form>
 @endsection

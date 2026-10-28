@@ -184,14 +184,18 @@ class OrderService
      */
     private function createOrder(array $data, User $waiter, ?Table $table, array $menuItems): Order
     {
-        $customer = Customer::query()->whereKey($data['customer_id'] ?? 0)->first();
-        if (! $customer || ! $customer->is_active) {
-            throw new BusinessConflictException('An active customer is required to start a new order.');
-        }
-
         $dineType = DineType::query()->whereKey($data['dine_type_id'] ?? 0)->first();
         if (! $dineType || ! $dineType->is_active) {
             throw new BusinessConflictException('An active dine type is required to start a new order.');
+        }
+
+        $customer = Customer::query()->whereKey($data['customer_id'] ?? 0)->first();
+        if ($customer && ! $customer->is_active) {
+            throw new BusinessConflictException('This customer is inactive and cannot be used for a new order.');
+        }
+
+        if (! $customer && $dineType->requiresTable()) {
+            throw new BusinessConflictException('An active customer is required to start a new order.');
         }
 
         if ($dineType->requiresTable() && $table === null) {
@@ -282,7 +286,10 @@ class OrderService
 
         $order = Order::query()->create([
             'order_number' => $this->orderNumberGenerator->generate(),
-            'customer_id' => $customer->id,
+            'customer_id' => $customer?->id,
+            'historical_customer_name' => filled($data['historical_customer_name'] ?? null)
+                ? mb_substr(trim((string) $data['historical_customer_name']), 0, 150)
+                : null,
             'dine_type_id' => $dineType->id,
             'table_id' => $table?->id,
             'waiter_id' => $waiter->id,

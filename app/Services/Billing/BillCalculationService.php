@@ -43,9 +43,11 @@ class BillCalculationService
 
         $subtotalCents = 0;
         foreach ($items as $item) {
-            $lineCents = $this->toCents((float) $item->unit_price) * $item->quantity;
-            $lineCents += $this->toCents((float) $item->packing_fee);
-            $subtotalCents += $lineCents;
+            $subtotalCents += $this->toCents($this->lineAmount(
+                (float) $item->unit_price,
+                (int) $item->quantity,
+                (float) $item->packing_fee,
+            ));
         }
 
         return [
@@ -135,6 +137,16 @@ class BillCalculationService
         }
 
         return (float) $discount->value;
+    }
+
+    /**
+     * Packing is a flat charge for the line, added once. It is not multiplied by quantity.
+     */
+    public function lineAmount(float $unitPrice, int $quantity, float $packingFee): float
+    {
+        $cents = ($this->toCents($unitPrice) * $quantity) + $this->toCents($packingFee);
+
+        return $this->fromCents($cents);
     }
 
     public function isEligible(Order $order): bool

@@ -22,7 +22,13 @@ class OrderBillController extends Controller
 
     public function show(Order $order): View
     {
-        return view('shared.billing.view-bill', $this->viewData($order));
+        $data = $this->viewData($order);
+
+        if (request()->ajax()) {
+            return view('shared.billing.view-bill', $data);
+        }
+
+        return view('counter.billing.show', $data);
     }
 
     public function print(Order $order): View

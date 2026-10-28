@@ -62,6 +62,14 @@ class TakeawayOrderController extends Controller
         return $this->mutate(fn () => $this->takeaway->changeQuantity($menuItem, -1), 'counter.takeaway.menu');
     }
 
+    public function menuPacking(int $menuItem): RedirectResponse
+    {
+        return $this->mutate(
+            fn () => $this->takeaway->setPacking($menuItem, request()->boolean('enabled')),
+            'counter.takeaway.menu',
+        );
+    }
+
     public function cart(): View|RedirectResponse
     {
         if (! $this->takeaway->hasDraft()) {
@@ -112,8 +120,8 @@ class TakeawayOrderController extends Controller
         }
 
         return redirect()
-            ->route('counter.dashboard')
-            ->with('success', 'Order '.$order->order_number.' placed.');
+            ->route('counter.orders.bill', $order)
+            ->with('success', 'Order '.$order->order_number.' placed. Bill is ready to view and edit.');
     }
 
     private function mutate(callable $action, string $route): RedirectResponse

@@ -248,6 +248,7 @@ Route::prefix('counter')->name('counter.')->group(function () {
             Route::post('/menus/{menuItem}', [TakeawayOrderController::class, 'add'])->name('takeaway.menu.add');
             Route::post('/menus/{menuItem}/increase', [TakeawayOrderController::class, 'increase'])->name('takeaway.menu.increase');
             Route::post('/menus/{menuItem}/decrease', [TakeawayOrderController::class, 'decrease'])->name('takeaway.menu.decrease');
+            Route::post('/menus/{menuItem}/packing', [TakeawayOrderController::class, 'menuPacking'])->name('takeaway.menu.packing');
             Route::get('/cart', [TakeawayOrderController::class, 'cart'])->name('takeaway.cart');
             Route::post('/cart/{menuItem}/increase', [TakeawayOrderController::class, 'cartIncrease'])->name('takeaway.cart.increase');
             Route::post('/cart/{menuItem}/decrease', [TakeawayOrderController::class, 'cartDecrease'])->name('takeaway.cart.decrease');
