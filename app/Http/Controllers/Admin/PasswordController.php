@@ -15,9 +15,9 @@ class PasswordController extends Controller
     public function create(): View
     {
         return view('auth.change-password', [
-            'title' => 'Change admin password',
-            'action' => route('admin.password.update'),
-            'loginUrl' => route('admin.login'),
+            'title' => 'Change password',
+            'action' => route('password.update'),
+            'loginUrl' => route('login'),
         ]);
     }
 
@@ -29,6 +29,6 @@ class PasswordController extends Controller
             'password',
         ]));
 
-        return redirect()->route('admin.login')->with('status', 'Password changed. Sign in with the new password.');
+        return redirect()->route('login')->with('status', 'Password changed. Sign in with the new password.');
     }
 }

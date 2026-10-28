@@ -5,19 +5,23 @@
 @section('content')
     <div class="admin-login-screen flex min-h-screen items-center justify-center px-3 py-10 sm:px-4">
         <div class="w-full max-w-[450px] rounded-[10px] bg-white p-6 shadow-[0_0_37px_rgba(8,21,66,0.08)] sm:p-10">
-            <a href="{{ route('admin.login') }}" class="mb-2.5 block text-center">
+            <a href="{{ route('login') }}" class="mb-2.5 block text-center">
                 <img src="{{ asset('images/admin/versity-logo-white.jpg') }}" alt="Varsity Kitchen" class="inline-block h-auto w-[130px]">
             </a>
 
-            <form method="POST" action="{{ route('admin.login') }}" class="font-['Nunito_Sans',Roboto,sans-serif]" novalidate>
+            <form method="POST" action="{{ route('login') }}" class="font-['Nunito_Sans',Roboto,sans-serif]" novalidate>
                 @csrf
                 <h3 class="mb-1 text-center text-2xl font-semibold text-[#1f2f3e]">Sign in to account</h3>
                 <p class="mb-6 text-center text-sm text-[#898989]">Enter your username & password to login</p>
 
+                @if (session('status'))
+                    <p class="mb-4 text-sm text-[#198754]">{{ session('status') }}</p>
+                @endif
+
                 @if ($errors->any())
                     <p class="mb-4 text-sm text-[#dc3545]">{{ $errors->first() }}</p>
                     @if (str_contains($errors->first(), 'Change your password'))
-                        <a href="{{ route('admin.password.edit') }}" class="mb-4 block text-center text-sm text-[#04346a]">Change password</a>
+                        <a href="{{ route('password.edit') }}" class="mb-4 block text-center text-sm text-[#04346a]">Change password</a>
                     @endif
                 @endif
 

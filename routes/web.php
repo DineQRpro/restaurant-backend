@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BillPaymentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DiscountController;
@@ -13,7 +12,8 @@ use App\Http\Controllers\Admin\ReceiptController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Counter\AuthController as CounterAuthController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Services\Auth\PosLoginService;
 use App\Http\Controllers\Counter\BillPaymentController as CounterBillPaymentController;
 use App\Http\Controllers\Counter\DashboardController as CounterDashboardController;
 use App\Http\Controllers\Counter\KotController as CounterKotController;
@@ -24,18 +24,36 @@ use App\Http\Controllers\Counter\TakeawayOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('admin.login');
+    $dashboard = auth()->check()
+        ? app(PosLoginService::class)->dashboardUrl(auth()->user())
+        : null;
+
+    return redirect()->to($dashboard ?? route('login'));
 });
+
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/login', [LoginController::class, 'create'])->name('login');
+    Route::post('/auth/login', [LoginController::class, 'store']);
+    Route::get('/login', fn () => redirect()->route('login'));
+    Route::get('/auth/password', [PasswordController::class, 'create'])->name('password.edit');
+    Route::post('/auth/password', [PasswordController::class, 'store'])->name('password.update');
+});
+
+Route::get('/auth/unavailable', [LoginController::class, 'unavailable'])->name('auth.unavailable');
+
+Route::post('/auth/logout', [LoginController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
-        Route::get('/login', [AuthController::class, 'create'])->name('login');
-        Route::post('/login', [AuthController::class, 'store']);
-        Route::get('/password', [PasswordController::class, 'create'])->name('password.edit');
+        Route::get('/login', fn () => redirect()->route('login'))->name('login');
+        Route::post('/login', [LoginController::class, 'store']);
+        Route::get('/password', fn () => redirect()->route('password.edit'))->name('password.edit');
         Route::post('/password', [PasswordController::class, 'store'])->name('password.update');
     });
 
-    Route::post('/logout', [AuthController::class, 'destroy'])
+    Route::post('/logout', [LoginController::class, 'destroy'])
         ->middleware('auth')
         ->name('logout');
 
@@ -225,13 +243,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::prefix('counter')->name('counter.')->group(function () {
     Route::middleware('guest')->group(function () {
-        Route::get('/login', [CounterAuthController::class, 'create'])->name('login');
-        Route::post('/login', [CounterAuthController::class, 'store']);
-        Route::get('/password', [CounterPasswordController::class, 'create'])->name('password.edit');
+        Route::get('/login', fn () => redirect()->route('login'))->name('login');
+        Route::post('/login', [LoginController::class, 'store']);
+        Route::get('/password', fn () => redirect()->route('password.edit'))->name('password.edit');
         Route::post('/password', [CounterPasswordController::class, 'store'])->name('password.update');
     });
 
-    Route::post('/logout', [CounterAuthController::class, 'destroy'])
+    Route::post('/logout', [LoginController::class, 'destroy'])
         ->middleware('auth')
         ->name('logout');
 

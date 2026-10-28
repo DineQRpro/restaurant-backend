@@ -11,8 +11,13 @@
         <p class="text-sm font-bold uppercase tracking-wide text-[#04346a]">403</p>
         <h1 class="mt-2 text-2xl font-bold">You do not have access</h1>
         <p class="mt-2 text-sm text-[#898989]">{{ $exception->getMessage() ?: 'You do not have permission to perform this action.' }}</p>
-        <a href="{{ route('admin.login') }}" class="mt-6 inline-block rounded-md bg-[#04346a] px-4 py-2 text-sm font-semibold text-white">
-            Go to admin login
+        @php
+            $home = auth()->check()
+                ? app(\App\Services\Auth\PosLoginService::class)->dashboardUrl(auth()->user())
+                : null;
+        @endphp
+        <a href="{{ $home ?? route('login') }}" class="mt-6 inline-block rounded-md bg-[#04346a] px-4 py-2 text-sm font-semibold text-white">
+            {{ $home ? 'Back to dashboard' : 'Sign in' }}
         </a>
     </div>
 </body>

@@ -17,7 +17,7 @@ class PasswordController extends Controller
         return view('auth.change-password', [
             'title' => 'Change counter password',
             'action' => route('counter.password.update'),
-            'loginUrl' => route('counter.login'),
+            'loginUrl' => route('login'),
         ]);
     }
 
@@ -29,6 +29,6 @@ class PasswordController extends Controller
             'password',
         ]));
 
-        return redirect()->route('counter.login')->with('status', 'Password changed. Sign in with the new password.');
+        return redirect()->route('login')->with('status', 'Password changed. Sign in with the new password.');
     }
 }
