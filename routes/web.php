@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ReceiptController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\AccountPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Services\Auth\PosLoginService;
 use App\Http\Controllers\Counter\BillPaymentController as CounterBillPaymentController;
@@ -35,8 +36,15 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/login', [LoginController::class, 'create'])->name('login');
     Route::post('/auth/login', [LoginController::class, 'store']);
     Route::get('/login', fn () => redirect()->route('login'));
-    Route::get('/auth/password', [PasswordController::class, 'create'])->name('password.edit');
+    Route::get('/auth/change-password', [PasswordController::class, 'create'])->name('password.change');
+    Route::post('/auth/change-password', [PasswordController::class, 'store'])->name('password.change.store');
+    Route::get('/auth/password', fn () => redirect()->route('password.change'))->name('password.edit');
     Route::post('/auth/password', [PasswordController::class, 'store'])->name('password.update');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/auth/account/password', [AccountPasswordController::class, 'edit'])->name('account.password.edit');
+    Route::post('/auth/account/password', [AccountPasswordController::class, 'update'])->name('account.password.update');
 });
 
 Route::get('/auth/unavailable', [LoginController::class, 'unavailable'])->name('auth.unavailable');

@@ -20,9 +20,6 @@
 
                 @if ($errors->any())
                     <p class="mb-4 text-sm text-[#dc3545]">{{ $errors->first() }}</p>
-                    @if (str_contains($errors->first(), 'Change your password'))
-                        <a href="{{ route('password.edit') }}" class="mb-4 block text-center text-sm text-[#04346a]">Change password</a>
-                    @endif
                 @endif
 
                 <div class="mb-3">
@@ -66,6 +63,7 @@
                 <button type="submit" class="w-full rounded-md bg-[#04346a] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#03284f]">
                     Sign in
                 </button>
+                <a href="{{ route('password.change') }}" class="mt-4 block text-center text-sm text-[#04346a]">Change password</a>
             </form>
         </div>
     </div>

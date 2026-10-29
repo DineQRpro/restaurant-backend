@@ -66,6 +66,9 @@
     </nav>
 
     <div class="border-t border-white/10 p-3">
+        <a href="{{ route('account.password.edit') }}" class="mb-1 block rounded-md px-3 py-2.5 text-sm font-semibold text-white/85 hover:bg-white/10">
+            Change Password
+        </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="w-full rounded-md px-3 py-2.5 text-left text-sm font-semibold text-white/85 hover:bg-white/10">

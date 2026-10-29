@@ -16,8 +16,11 @@ class PasswordController extends Controller
     {
         return view('auth.change-password', [
             'title' => 'Change password',
-            'action' => route('password.update'),
-            'loginUrl' => route('login'),
+            'intro' => 'Enter your current password, then choose a new one. You can sign in after it is saved.',
+            'action' => route('password.change.store'),
+            'backUrl' => route('login'),
+            'backLabel' => 'Back to sign in',
+            'requireUsername' => true,
         ]);
     }
 
