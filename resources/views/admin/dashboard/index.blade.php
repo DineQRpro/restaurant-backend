@@ -27,9 +27,7 @@
         </article>
     </section>
 
-    @include('shared.dashboard.table-board', ['dashboard' => $dashboard])
-
-    <section class="overflow-hidden rounded-xl bg-white shadow-sm">
+    <section class="mb-5 overflow-hidden rounded-xl bg-white shadow-sm">
         <div class="border-b border-[#eef1f5] px-5 py-4">
             <h2 class="text-lg font-bold text-[#1f2f3e]">Track Orders</h2>
         </div>
@@ -51,8 +49,15 @@
                     ->values(),
             ])
 
-            @if ($dashboard['unavailable_items']->isNotEmpty())
-                <h3 class="mt-6 text-sm font-bold uppercase tracking-wide text-[#898989]">Sold out dishes</h3>
+        </div>
+    </section>
+
+    @include('shared.dashboard.table-board', ['dashboard' => $dashboard])
+
+    @if ($dashboard['unavailable_items']->isNotEmpty())
+        <section class="mt-5 overflow-hidden rounded-xl bg-white shadow-sm">
+            <div class="p-5">
+                <h3 class="text-sm font-bold uppercase tracking-wide text-[#898989]">Sold out dishes</h3>
                 <ul class="mt-3 divide-y divide-[#eef1f5] rounded-lg border border-[#eef1f5]">
                     @foreach ($dashboard['unavailable_items'] as $item)
                         <li class="flex items-center justify-between px-4 py-3 text-sm">
@@ -61,9 +66,9 @@
                         </li>
                     @endforeach
                 </ul>
-            @endif
-        </div>
-    </section>
+            </div>
+        </section>
+    @endif
 
     @if ($canViewKot || $canEditKot || $canViewBill)
         @include('shared.dashboard.order-action-modals')

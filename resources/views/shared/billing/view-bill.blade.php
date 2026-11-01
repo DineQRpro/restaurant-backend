@@ -67,19 +67,13 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($bill->items as $item)
-                    @php
-                        $qty = max(1, (int) $item->quantity);
-                        $basePrice = (float) $item->unit_price;
-                        $packingFee = (float) $item->packing_fee;
-                        $lineTotal = app(\App\Services\Billing\BillCalculationService::class)->lineAmount($basePrice, $qty, $packingFee);
-                    @endphp
+                @forelse ($displayItems as $item)
                     <tr>
-                        <td data-label="Product Title">{{ $item->item_name }}</td>
-                        <td class="num" data-label="Quantity">{{ $item->quantity }}</td>
-                        <td class="num" data-label="Price">{{ number_format($basePrice, 2) }}</td>
-                        <td class="num" data-label="Packing Charge">{{ number_format($packingFee, 2) }}</td>
-                        <td class="num bill-line-total" data-label="Total">{{ number_format($lineTotal, 2) }}</td>
+                        <td data-label="Product Title">{{ $item['item_name'] }}</td>
+                        <td class="num" data-label="Quantity">{{ $item['quantity'] }}</td>
+                        <td class="num" data-label="Price">{{ number_format($item['unit_price'], 2) }}</td>
+                        <td class="num" data-label="Packing Charge">{{ number_format($item['packing_fee'], 2) }}</td>
+                        <td class="num bill-line-total" data-label="Total">{{ number_format($item['line_total'], 2) }}</td>
                     </tr>
                 @empty
                     <tr>

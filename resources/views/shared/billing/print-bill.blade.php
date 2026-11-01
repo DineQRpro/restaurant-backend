@@ -69,20 +69,14 @@
 
         <hr class="print-bill-rule">
 
-        @foreach ($bill->items as $item)
-            @php
-                $qty = max(1, (int) $item->quantity);
-                $basePrice = (float) $item->unit_price;
-                $packingFee = (float) $item->packing_fee;
-                $lineAmount = app(\App\Services\Billing\BillCalculationService::class)->lineAmount($basePrice, $qty, $packingFee);
-            @endphp
+        @foreach ($displayItems as $item)
             <div class="print-bill-item">
                 <div class="print-bill-col-item">
-                    {{ $item->item_name }}
+                    {{ $item['item_name'] }}
                 </div>
-                <div class="print-bill-col-qty">{{ $item->quantity }}</div>
-                <div class="print-bill-col-rate">{{ number_format($basePrice, 2) }}</div>
-                <div class="print-bill-col-amt">{{ number_format($lineAmount, 2) }}</div>
+                <div class="print-bill-col-qty">{{ $item['quantity'] }}</div>
+                <div class="print-bill-col-rate">{{ number_format($item['unit_price'], 2) }}</div>
+                <div class="print-bill-col-amt">{{ number_format($item['line_total'], 2) }}</div>
             </div>
         @endforeach
 

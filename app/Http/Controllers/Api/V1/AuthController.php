@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\LoginRequest;
+use App\Http\Requests\Auth\AccountPasswordRequest;
 use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Services\AuthService;
@@ -37,6 +38,21 @@ class AuthController extends Controller
             'current_password',
             'password',
         ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed. Sign in with the new password.',
+            'data' => null,
+        ]);
+    }
+
+    public function updatePassword(AccountPasswordRequest $request): JsonResponse
+    {
+        $this->authService->updateOwnPassword(
+            $request->user(),
+            (string) $request->string('current_password'),
+            (string) $request->string('password'),
+        );
 
         return response()->json([
             'success' => true,

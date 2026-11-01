@@ -17,7 +17,16 @@ class BillViewService
     public function __construct(
         private readonly BillCalculationService $calculator,
         private readonly DiscountService $discountService,
+        private readonly BillItemAggregationService $itemAggregation,
     ) {}
+
+    /**
+     * @return list<array{item_name: string, quantity: int, unit_price: float, packing_fee: float, line_total: float}>
+     */
+    public function displayItems(Bill $bill): array
+    {
+        return $this->itemAggregation->lines($bill);
+    }
 
     public function forOrder(Order $order): Bill
     {
@@ -168,6 +177,7 @@ class BillViewService
             'bill' => $bill,
             'order' => $billOrder,
             'tableDisplay' => $billOrder->tableDisplayName(),
+            'displayItems' => $this->displayItems($bill),
             'summary' => $summary,
             'restaurant' => $this->restaurantPrintHeader(),
             'isTakeaway' => $billOrder->dineType && ! $billOrder->dineType->requiresTable(),

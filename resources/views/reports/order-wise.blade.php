@@ -30,6 +30,7 @@
                         <th class="text-right">Packing Charges</th>
                         <th class="text-right">PAX</th>
                         <th class="text-right">PAX Average</th>
+                        <th>View Bill</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,10 +47,22 @@
                             <td class="text-right">{{ number_format((float) $row->packing_charges, 2) }}</td>
                             <td class="text-right">{{ $row->pax }}</td>
                             <td class="text-right">{{ $row->pax_average === null ? '' : number_format((float) $row->pax_average, 2) }}</td>
+                            <td>
+                                @if ($canViewBill && $billRouteName && $row->order_id)
+                                    <a
+                                        href="{{ route($billRouteName, $row->order_id) }}"
+                                        class="text-sm font-semibold text-[#04346a] hover:underline"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >View Bill</a>
+                                @else
+                                    —
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="report-empty">{{ $emptyMessage }}</td>
+                            <td colspan="12" class="report-empty">{{ $emptyMessage }}</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -62,6 +75,7 @@
                             <td class="text-right">{{ $totals['total_quantity'] }}</td>
                             <td class="text-right">{{ number_format($totals['packing_charges'], 2) }}</td>
                             <td colspan="2"></td>
+                            <td></td>
                         </tr>
                     </tfoot>
                 @endif

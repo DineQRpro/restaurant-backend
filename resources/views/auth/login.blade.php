@@ -12,7 +12,7 @@
             <form method="POST" action="{{ route('login') }}" class="font-['Nunito_Sans',Roboto,sans-serif]" novalidate>
                 @csrf
                 <h3 class="mb-1 text-center text-2xl font-semibold text-[#1f2f3e]">Sign in to account</h3>
-                <p class="mb-6 text-center text-sm text-[#898989]">Enter your username & password to login</p>
+                <p class="mb-6 text-center text-sm text-[#898989]">Enter your username and password to log in</p>
 
                 @if (session('status'))
                     <p class="mb-4 text-sm text-[#198754]">{{ session('status') }}</p>
@@ -23,7 +23,7 @@
                 @endif
 
                 <div class="mb-3">
-                    <label for="username" class="mb-1.5 block text-[15px] tracking-wide text-[#1f2f3e]">Email Address</label>
+                    <label for="username" class="mb-1.5 block text-[15px] tracking-wide text-[#1f2f3e]">Username</label>
                     <input
                         id="username"
                         type="text"

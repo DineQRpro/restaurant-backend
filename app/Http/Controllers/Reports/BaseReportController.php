@@ -38,6 +38,11 @@ abstract class BaseReportController extends Controller
 
     abstract protected function dashboardRoute(): string;
 
+    protected function billRouteName(): string
+    {
+        return str_replace('.reports', '.orders.bill', $this->routePrefix());
+    }
+
     public function transaction(ReportFilterRequest $request): View|Response
     {
         $filters = $request->filters($this->dates);
@@ -150,6 +155,8 @@ abstract class BaseReportController extends Controller
             'emptyMessage' => 'There is no order wise report.',
             'billNoFilter' => true,
             'orderTypeFilter' => true,
+            'canViewBill' => $request->user()?->hasPermission('bills.view') ?? false,
+            'billRouteName' => $this->billRouteName(),
         ]);
     }
 

@@ -83,6 +83,7 @@ class OrderWiseReportService
         return $query
             ->selectRaw(
                 "{$timestamp} AS report_date,
+                orders.id AS order_id,
                 orders.order_number,
                 bills.bill_number,
                 COALESCE(dine_types.name, '-') AS order_type,

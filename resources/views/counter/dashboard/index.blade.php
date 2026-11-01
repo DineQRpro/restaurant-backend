@@ -12,9 +12,7 @@
     @endphp
     @include('shared.dashboard.overview', ['dashboard' => $dashboard])
 
-    @include('shared.dashboard.table-board', ['dashboard' => $dashboard])
-
-    <section class="overflow-hidden rounded-xl bg-white shadow-sm">
+    <section class="mb-5 overflow-hidden rounded-xl bg-white shadow-sm">
         <div class="border-b border-[#eef1f5] px-5 py-4">
             <h2 class="text-lg font-bold text-[#1f2f3e]">Track Orders</h2>
         </div>
@@ -36,6 +34,8 @@
             ])
         </div>
     </section>
+
+    @include('shared.dashboard.table-board', ['dashboard' => $dashboard])
 
     @if ($canViewKot || $canEditKot || $canViewBill)
         @include('shared.dashboard.order-action-modals')

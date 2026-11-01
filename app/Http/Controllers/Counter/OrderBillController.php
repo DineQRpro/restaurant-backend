@@ -90,6 +90,7 @@ class OrderBillController extends Controller
             'order' => $billOrder,
             'tableDisplay' => $this->kotViewService->tableDisplay($billOrder),
             'summary' => $this->billViewService->summary($bill),
+            'displayItems' => $this->billViewService->displayItems($bill),
             'discountOptions' => $this->billViewService->discountOptions(),
             'canApplyAdjustments' => $canApplyAdjustments,
             'adjustmentsApplyUrl' => route('counter.orders.bill.adjustments', $billOrder),
