@@ -57,6 +57,9 @@ users.delete
 * `tables.merge`
 * `tables.transfer`
 * `tables.clean`
+* `tables.layout` — arrange the Admin floor plan. Assigned to Admin only.
+
+`tables.layout` is created by `PermissionSeeder` and by migration `2026_11_06_180000_grant_floor_layout_permission`. The migration grants it to the Admin role with `syncWithoutDetaching`. Running `php artisan migrate` on an existing database adds the permission without reseeding roles or removing any current grants. Waiter, Captain, and Counter do not receive it.
 
 ### Orders
 
