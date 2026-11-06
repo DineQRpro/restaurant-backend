@@ -26,6 +26,8 @@ class Table extends Model
         'code',
         'sort_order',
         'is_active',
+        'layout_x',
+        'layout_y',
     ];
 
     protected function casts(): array
@@ -36,6 +38,8 @@ class Table extends Model
             'status' => TableOperationalStatus::class,
             'sort_order' => 'integer',
             'is_active' => 'boolean',
+            'layout_x' => 'integer',
+            'layout_y' => 'integer',
         ];
     }
 

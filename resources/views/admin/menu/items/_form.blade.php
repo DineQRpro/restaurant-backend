@@ -142,7 +142,7 @@
                 class="rounded border-[#dfdfdf] text-[#04346a]"
                 @checked((string) old('is_chef_special', $item?->is_chef_special ?? false) === '1' || old('is_chef_special', $item?->is_chef_special ?? false) === true)
             >
-            Chef's Special
+            Today's Special
         </label>
         <label class="inline-flex items-center gap-2 text-sm font-semibold text-[#1f2f3e]">
             <input type="hidden" name="is_available" value="0">

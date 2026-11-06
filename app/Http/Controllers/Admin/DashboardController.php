@@ -22,6 +22,7 @@ class DashboardController extends Controller
             'canViewKot' => $user?->hasPermission('kot.view') ?? false,
             'canEditKot' => $user?->hasPermission('kot.update') ?? false,
             'canViewBill' => $user?->hasPermission('bills.view') ?? false,
+            'canArrangeFloor' => $user?->hasPermission('tables.layout') ?? false,
         ]);
     }
 }

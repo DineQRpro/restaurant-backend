@@ -13,6 +13,9 @@ class Floor extends Model
         'description',
         'sort_order',
         'is_active',
+        'layout_version',
+        'layout_columns',
+        'layout_rows',
     ];
 
     protected function casts(): array
@@ -20,6 +23,9 @@ class Floor extends Model
         return [
             'sort_order' => 'integer',
             'is_active' => 'boolean',
+            'layout_version' => 'integer',
+            'layout_columns' => 'integer',
+            'layout_rows' => 'integer',
         ];
     }
 

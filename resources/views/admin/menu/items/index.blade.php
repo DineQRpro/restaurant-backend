@@ -15,7 +15,6 @@
             ->filter(fn ($value) => $value !== null && $value !== '')
             ->isNotEmpty()
             || (($filters['menu_type'] ?? 'food') !== 'food');
-        $spicyLabels = [1 => 'Spicy', 2 => 'Very Spicy'];
     @endphp
 
     <nav class="mb-4 text-sm text-[#898989]" aria-label="Breadcrumb">
@@ -121,7 +120,7 @@
                             <td class="px-4 py-3 text-[#425466]">{{ $item->category?->name ?? '—' }}</td>
                             <td class="px-4 py-3 whitespace-nowrap font-semibold">₹{{ number_format((float) $item->price, 2) }}</td>
                             <td class="px-4 py-3">{{ $item->dietary_type?->label() ?? '—' }}</td>
-                            <td class="px-4 py-3">{{ $spicyLabels[$item->spicy_level] ?? 'Not Spicy' }}</td>
+                            <td class="px-4 py-3">@include('admin.menu.items._spicy-icons', ['level' => $item->spicy_level])</td>
                             <td class="px-4 py-3">
                                 <span @class([
                                     'inline-flex rounded-full px-2.5 py-1 text-xs font-bold',

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\DineTypeController;
+use App\Http\Controllers\Api\V1\FloorController;
 use App\Http\Controllers\Api\V1\Menu\MenuCategoryController;
 use App\Http\Controllers\Api\V1\Menu\MenuItemController;
 use App\Http\Controllers\Api\V1\OrderController;
@@ -67,6 +68,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/items/{item}', [MenuItemController::class, 'destroy'])
             ->middleware('permission:menu.delete');
     });
+
+    Route::get('/floors', [FloorController::class, 'index'])
+        ->middleware('permission:tables.view');
+    Route::get('/floors/{floor}/layout', [FloorController::class, 'show'])
+        ->middleware('permission:tables.view');
+    Route::put('/floors/{floor}/layout', [FloorController::class, 'update'])
+        ->middleware('permission:tables.layout');
 
     Route::get('/tables', [TableController::class, 'index'])
         ->middleware('permission:tables.view');

@@ -8,6 +8,41 @@ Waiter vacant/occupied/reserved flows are **not** part of this module.
 
 ---
 
+## Floor layout
+
+Floors live in `floors`. A table belongs to at most one floor through `tables.floor_id`. There is no separate area or section table.
+
+| Column | Notes |
+| ------ | ----- |
+| `floors.name`, `code`, `description`, `sort_order`, `is_active` | Floor master. `code` is unique. |
+| `floors.layout_columns`, `floors.layout_rows` | Grid size for that floor. Defaults are 8 columns and 6 rows. |
+| `floors.layout_version` | Incremented when positions or grid dimensions change. A stale save is rejected. |
+| `tables.layout_x` | Zero-based column. Null means the table is not positioned. |
+| `tables.layout_y` | Zero-based row. Null means the table is not positioned. |
+
+The Admin page is `/admin/floor-layout`. **Add Floor** and **Edit Floor** are on that page. Add Floor asks for the name, an optional description, rows, and columns. The code is generated from the name, the floor is active, and the sort order follows the existing floors. Name and code must stay unique. Saving a name or description does not move tables or change `layout_version`. Rows and columns are saved on that floor only. The dialog previews the proposed grid and names any table that would fall outside a smaller grid. The server rejects that save and leaves the coordinates unchanged.
+
+It requires the Admin session and `tables.layout`. The sidebar item is **Floor Layout**, next to Tables. The Admin Dashboard shortcut uses the same Laravel route. Counter and Waiter cannot open it. New active floors are returned by `GET /api/v1/floors` for the Waiter floor selector.
+
+A row and a column identify one table position. Every positioned table occupies exactly one cell. `layout_x` is the column and `layout_y` is the row. Capacity does not change how many cells a table uses, and width and height are not stored. Adjacent occupied cells are valid. Two tables cannot share the same cell.
+
+Seating capacity only changes the drawing inside that cell:
+
+| Seats | Illustration inside the cell |
+| ----- | ---------------------------- |
+| 1–2 | Small |
+| 3–4 | Medium |
+| 5–6 | Large |
+| 7+ | Extra large |
+
+Every cell on a floor has the same width and the same height. The Admin canvas draws one shaded cell for every saved row and column. The gap between those cells is the walkway. It is visual spacing only: empty cells are not stored as pathways, and a table can still be placed on any open cell. A table must stay inside that floor's grid. Column 1 and row 1 in the Admin form are stored as `0, 0`. Shrinking the grid is rejected while a saved placement would fall outside. Existing coordinates are not moved or cleared by a rejected resize.
+
+Saving a layout replaces the positions of tables already on that floor. The page submits every table that should stay placed. Omitting one of those tables clears only that table's coordinates. It does not change tables on other floors. Assigning a table is a separate action: it sets `floor_id` and the chosen cell, and it does not change the order, bill, KOT, or occupancy.
+
+`GET /api/v1/floors` and `GET /api/v1/floors/{floor}/layout` require `tables.view`. `PUT /api/v1/floors/{floor}/layout` requires `tables.layout`. The Waiter floor reads that layout and keeps the existing table click actions. It does not drag or save positions. The Admin page, the Admin and Counter dashboard maps, and the Waiter floor use the same one-cell coordinates.
+
+---
+
 ## 1. Legacy findings
 
 Core PHP stores tables in `tbl_tables` and operational events in `tbl_tables_status`.
@@ -70,9 +105,11 @@ Table: `tables`
 | `code` | varchar, unique | Public identifier replacing `tbl_tbid`. Generated on create. Not editable. |
 | `sort_order` | unsigned int | Default `0`. Project convention (legacy used `tables_id` order). |
 | `is_active` | boolean | Default `true`. New. Inactive tables stay in the database for history but must not be selectable for new operational activity. |
+| `floor_id` | nullable FK | Floor assignment. See **Floor layout**. |
+| `layout_x`, `layout_y` | nullable smallint | Zero-based column and row. Null until the table is positioned. |
 | `created_at` / `updated_at` | timestamps | |
 
-There is no `area_id` / `section_id`.
+There is no `area_id` / `section_id`. The floor is `tables.floor_id`.
 
 Relationship for future modules:
 

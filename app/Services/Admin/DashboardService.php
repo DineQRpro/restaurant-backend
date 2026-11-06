@@ -49,7 +49,7 @@ class DashboardService
 
         $tables = Table::query()
             ->active()
-            ->with(['unreleasedOrders'])
+            ->with(['unreleasedOrders', 'floor:id,name,layout_columns,layout_rows'])
             ->orderBy('sort_order')
             ->orderBy('number')
             ->get([
@@ -60,6 +60,9 @@ class DashboardService
                 'code',
                 'sort_order',
                 'status',
+                'floor_id',
+                'layout_x',
+                'layout_y',
             ]);
 
         $orderCounts = Order::query()

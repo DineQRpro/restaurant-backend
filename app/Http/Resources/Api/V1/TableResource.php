@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Models\Order;
 use App\Services\Billing\BillCalculationService;
+use App\Services\Table\TableLayout;
 use App\Services\Table\TableOccupancy;
 use App\Services\Table\TableOccupancyService;
 use Illuminate\Http\Request;
@@ -28,6 +29,7 @@ class TableResource extends JsonResource
             'status' => $occupancy->status->value,
             'server_now' => now()->toIso8601String(),
             'floor_id' => $this->floor_id,
+            'layout' => $this->layoutPayload(),
             'code' => $this->code,
             'sort_order' => $this->sort_order,
             'is_active' => $this->is_active,
@@ -50,6 +52,21 @@ class TableResource extends JsonResource
             ),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
+        ];
+    }
+
+    /**
+     * @return array{x: int|null, y: int|null, width: int, height: int}
+     */
+    private function layoutPayload(): array
+    {
+        $size = TableLayout::size((int) $this->capacity);
+
+        return [
+            'x' => $this->layout_x === null ? null : (int) $this->layout_x,
+            'y' => $this->layout_y === null ? null : (int) $this->layout_y,
+            'width' => $size['width'],
+            'height' => $size['height'],
         ];
     }
 

@@ -1,0 +1,5 @@
+# Cursor Agent Prompt 04 — Stock visibility and reports
+
+PRECONDITION: receipt posting and ledger tests approved. Implement inventory stock overview, movement history, low-stock alerts, maximum-stock warnings, and basic receipt/stock reports using existing Laravel Blade admin/report conventions. Compute authoritative stock from opening balance plus signed posted ledger movements; if adding a cached balance projection, implement reconciliation tests. Provide filtering, pagination, access controls and readable movement audit trails. Do not add multi-store, purchase orders, stock transfers, recipes, kitchen consumption or Sales deductions. Expose only completed links in sidebar. Verify no regression in Sales or Reports. Produce changed-file list and test results; stop for approval.
+
+Repository rules: inspect before editing; use existing project conventions; do not modify completed Sales module; do not invent existing schema/routes; avoid unnecessary dependencies. Provide file-by-file change report and tests. Stop at the requested gate.

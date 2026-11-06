@@ -61,6 +61,13 @@ class AdminNavigation
                 'match' => 'admin.tables.*',
             ],
             [
+                'label' => 'Floor Layout',
+                'permission' => 'tables.layout',
+                'available' => true,
+                'route' => 'admin.floor-layout.index',
+                'match' => 'admin.floor-layout.*',
+            ],
+            [
                 'label' => 'Discounts',
                 'permission' => 'discounts.view',
                 'available' => true,
@@ -86,6 +93,62 @@ class AdminNavigation
                 'label' => 'Payments',
                 'permission' => 'bills.settle',
                 'available' => false,
+            ],
+            [
+                'label' => 'Store & Inventory',
+                'permission' => 'inventory.view',
+                'available' => true,
+                'match' => 'admin.inventory.*',
+                'children' => [
+                    [
+                        'label' => 'Item Categories',
+                        'available' => true,
+                        'route' => 'admin.inventory.categories.index',
+                        'match' => 'admin.inventory.categories.*',
+                    ],
+                    [
+                        'label' => 'Units of Measure',
+                        'available' => true,
+                        'route' => 'admin.inventory.units.index',
+                        'match' => 'admin.inventory.units.*',
+                    ],
+                    [
+                        'label' => 'Inventory Items',
+                        'available' => true,
+                        'route' => 'admin.inventory.items.index',
+                        'match' => 'admin.inventory.items.*',
+                    ],
+                    [
+                        'label' => 'Vendors',
+                        'available' => true,
+                        'route' => 'admin.inventory.vendors.index',
+                        'match' => 'admin.inventory.vendors.*',
+                    ],
+                    [
+                        'label' => 'Goods Receipts',
+                        'available' => true,
+                        'route' => 'admin.inventory.receipts.index',
+                        'match' => 'admin.inventory.receipts.*',
+                    ],
+                    [
+                        'label' => 'Inventory Overview',
+                        'available' => true,
+                        'route' => 'admin.inventory.stock.index',
+                        'match' => 'admin.inventory.stock.index',
+                    ],
+                    [
+                        'label' => 'Stock Movements',
+                        'available' => true,
+                        'route' => 'admin.inventory.stock.movements',
+                        'match' => 'admin.inventory.stock.movements',
+                    ],
+                    [
+                        'label' => 'Low Stock',
+                        'available' => true,
+                        'route' => 'admin.inventory.stock.low',
+                        'match' => 'admin.inventory.stock.low',
+                    ],
+                ],
             ],
             [
                 'label' => 'Reports',

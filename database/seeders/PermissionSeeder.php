@@ -21,6 +21,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Merge Tables', 'slug' => 'tables.merge'],
             ['name' => 'Transfer Tables', 'slug' => 'tables.transfer'],
             ['name' => 'Clean Tables', 'slug' => 'tables.clean'],
+            ['name' => 'Arrange Floor Layout', 'slug' => 'tables.layout'],
 
             // Orders
             ['name' => 'View Orders', 'slug' => 'orders.view'],
@@ -61,6 +62,18 @@ class PermissionSeeder extends Seeder
 
             // Reports
             ['name' => 'View Reports', 'slug' => 'reports.view'],
+
+            // Store & Inventory masters. Separate from banquet receipts and sales bills.
+            ['name' => 'View Inventory', 'slug' => 'inventory.view'],
+            ['name' => 'Create Inventory', 'slug' => 'inventory.create'],
+            ['name' => 'Update Inventory', 'slug' => 'inventory.update'],
+            ['name' => 'Delete Inventory', 'slug' => 'inventory.delete'],
+            ['name' => 'View Goods Receipts', 'slug' => 'inventory.receipt.view'],
+            ['name' => 'Create Goods Receipts', 'slug' => 'inventory.receipt.create'],
+            ['name' => 'Update Goods Receipts', 'slug' => 'inventory.receipt.update'],
+            ['name' => 'Post Goods Receipts', 'slug' => 'inventory.receipt.post'],
+            ['name' => 'Void Goods Receipts', 'slug' => 'inventory.receipt.void'],
+            ['name' => 'View Inventory Stock', 'slug' => 'inventory.stock.view'],
 
             // Receipts (Admin banquet/event documents; independent of bills)
             ['name' => 'View Receipts', 'slug' => 'receipts.view'],

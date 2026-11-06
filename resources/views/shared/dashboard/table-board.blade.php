@@ -28,6 +28,20 @@
             @endforeach
         </div>
 
+        <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+                <p class="text-sm font-semibold text-[#1f2f3e]">View Floor Layout</p>
+                <p class="mt-1 text-xs text-[#898989]">Read-only table positions. Individual chairs are not arranged separately.</p>
+            </div>
+            @if ($canArrangeFloor ?? false)
+                <a href="{{ route('admin.floor-layout.index') }}" class="rounded-lg bg-[#04346a] px-4 py-2 text-sm font-semibold text-white">
+                    Floor Layout
+                </a>
+            @endif
+        </div>
+
+        @include('shared.dashboard.floor-map')
+
         @if ($dashboard['tables']->isEmpty())
             <div class="rounded-lg border border-dashed border-[#d5dde7] bg-[#f8fafc] p-6 text-center">
                 <p class="font-semibold text-[#1f2f3e]">No active tables.</p>

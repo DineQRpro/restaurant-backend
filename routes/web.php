@@ -2,7 +2,14 @@
 
 use App\Http\Controllers\Admin\BillPaymentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FloorLayoutController;
 use App\Http\Controllers\Admin\DiscountController;
+use App\Http\Controllers\Admin\Inventory\GoodsReceiptController;
+use App\Http\Controllers\Admin\Inventory\InventoryCategoryController;
+use App\Http\Controllers\Admin\Inventory\InventoryItemController;
+use App\Http\Controllers\Admin\Inventory\InventoryStockController;
+use App\Http\Controllers\Admin\Inventory\UnitOfMeasureController;
+use App\Http\Controllers\Admin\Inventory\VendorController;
 use App\Http\Controllers\Admin\KotController;
 use App\Http\Controllers\Admin\Menu\MenuCategoryController;
 use App\Http\Controllers\Admin\Menu\MenuItemController;
@@ -69,6 +76,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware('permission:dashboard.view')->group(function () {
             Route::get('/', fn () => redirect()->route('admin.dashboard'));
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        });
+
+        Route::middleware('permission:tables.layout')->group(function () {
+            Route::get('/floor-layout', [FloorLayoutController::class, 'index'])->name('floor-layout.index');
+            Route::post('/floor-layout/floors', [FloorLayoutController::class, 'store'])->name('floor-layout.floors.store');
+            Route::put('/floor-layout/floors/{floor}', [FloorLayoutController::class, 'update'])->name('floor-layout.floors.update');
+            Route::put('/floor-layout/floors/{floor}/layout', [FloorLayoutController::class, 'save'])->name('floor-layout.save');
+            Route::post('/floor-layout/floors/{floor}/assignments', [FloorLayoutController::class, 'assign'])->name('floor-layout.assign');
         });
 
         Route::get('/orders/{order}/kot', [KotController::class, 'show'])
@@ -212,6 +227,71 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/{discount}', [DiscountController::class, 'destroy'])
                 ->middleware('permission:discounts.delete')
                 ->name('destroy');
+        });
+
+        Route::prefix('inventory/categories')->name('inventory.categories.')->group(function () {
+            Route::get('/', [InventoryCategoryController::class, 'index'])->middleware('permission:inventory.view')->name('index');
+            Route::get('/create', [InventoryCategoryController::class, 'create'])->middleware('permission:inventory.create')->name('create');
+            Route::post('/', [InventoryCategoryController::class, 'store'])->middleware('permission:inventory.create')->name('store');
+            Route::get('/{category}', [InventoryCategoryController::class, 'show'])->middleware('permission:inventory.view')->name('show');
+            Route::get('/{category}/edit', [InventoryCategoryController::class, 'edit'])->middleware('permission:inventory.update')->name('edit');
+            Route::put('/{category}', [InventoryCategoryController::class, 'update'])->middleware('permission:inventory.update')->name('update');
+            Route::patch('/{category}/status', [InventoryCategoryController::class, 'updateStatus'])->middleware('permission:inventory.update')->name('status');
+            Route::delete('/{category}', [InventoryCategoryController::class, 'destroy'])->middleware('permission:inventory.delete')->name('destroy');
+        });
+
+        Route::prefix('inventory/units')->name('inventory.units.')->group(function () {
+            Route::get('/', [UnitOfMeasureController::class, 'index'])->middleware('permission:inventory.view')->name('index');
+            Route::get('/create', [UnitOfMeasureController::class, 'create'])->middleware('permission:inventory.create')->name('create');
+            Route::post('/', [UnitOfMeasureController::class, 'store'])->middleware('permission:inventory.create')->name('store');
+            Route::get('/{unit}', [UnitOfMeasureController::class, 'show'])->middleware('permission:inventory.view')->name('show');
+            Route::get('/{unit}/edit', [UnitOfMeasureController::class, 'edit'])->middleware('permission:inventory.update')->name('edit');
+            Route::put('/{unit}', [UnitOfMeasureController::class, 'update'])->middleware('permission:inventory.update')->name('update');
+            Route::patch('/{unit}/status', [UnitOfMeasureController::class, 'updateStatus'])->middleware('permission:inventory.update')->name('status');
+            Route::delete('/{unit}', [UnitOfMeasureController::class, 'destroy'])->middleware('permission:inventory.delete')->name('destroy');
+        });
+
+        Route::prefix('inventory/items')->name('inventory.items.')->group(function () {
+            Route::get('/', [InventoryItemController::class, 'index'])->middleware('permission:inventory.view')->name('index');
+            Route::get('/create', [InventoryItemController::class, 'create'])->middleware('permission:inventory.create')->name('create');
+            Route::post('/', [InventoryItemController::class, 'store'])->middleware('permission:inventory.create')->name('store');
+            Route::get('/{item}', [InventoryItemController::class, 'show'])->middleware('permission:inventory.view')->name('show');
+            Route::get('/{item}/edit', [InventoryItemController::class, 'edit'])->middleware('permission:inventory.update')->name('edit');
+            Route::put('/{item}', [InventoryItemController::class, 'update'])->middleware('permission:inventory.update')->name('update');
+            Route::patch('/{item}/status', [InventoryItemController::class, 'updateStatus'])->middleware('permission:inventory.update')->name('status');
+            Route::delete('/{item}', [InventoryItemController::class, 'destroy'])->middleware('permission:inventory.delete')->name('destroy');
+        });
+
+        Route::prefix('inventory/vendors')->name('inventory.vendors.')->group(function () {
+            Route::get('/', [VendorController::class, 'index'])->middleware('permission:inventory.view')->name('index');
+            Route::get('/create', [VendorController::class, 'create'])->middleware('permission:inventory.create')->name('create');
+            Route::post('/', [VendorController::class, 'store'])->middleware('permission:inventory.create')->name('store');
+            Route::get('/{vendor}', [VendorController::class, 'show'])->middleware('permission:inventory.view')->name('show');
+            Route::get('/{vendor}/edit', [VendorController::class, 'edit'])->middleware('permission:inventory.update')->name('edit');
+            Route::put('/{vendor}', [VendorController::class, 'update'])->middleware('permission:inventory.update')->name('update');
+            Route::patch('/{vendor}/status', [VendorController::class, 'updateStatus'])->middleware('permission:inventory.update')->name('status');
+            Route::delete('/{vendor}', [VendorController::class, 'destroy'])->middleware('permission:inventory.delete')->name('destroy');
+        });
+
+        Route::prefix('inventory/receipts')->name('inventory.receipts.')->group(function () {
+            Route::get('/', [GoodsReceiptController::class, 'index'])->middleware('permission:inventory.receipt.view')->name('index');
+            Route::get('/create', [GoodsReceiptController::class, 'create'])->middleware('permission:inventory.receipt.create')->name('create');
+            Route::post('/', [GoodsReceiptController::class, 'store'])->middleware('permission:inventory.receipt.create')->name('store');
+            Route::get('/items', [GoodsReceiptController::class, 'items'])->middleware('permission:inventory.receipt.view')->name('items');
+            Route::get('/vendors', [GoodsReceiptController::class, 'vendors'])->middleware('permission:inventory.receipt.view')->name('vendors');
+            Route::get('/{receipt}/print', [GoodsReceiptController::class, 'print'])->middleware('permission:inventory.receipt.view')->name('print');
+            Route::get('/{receipt}/edit', [GoodsReceiptController::class, 'edit'])->middleware('permission:inventory.receipt.update')->name('edit');
+            Route::put('/{receipt}', [GoodsReceiptController::class, 'update'])->middleware('permission:inventory.receipt.update')->name('update');
+            Route::delete('/{receipt}', [GoodsReceiptController::class, 'destroy'])->middleware('permission:inventory.receipt.update')->name('destroy');
+            Route::post('/{receipt}/post', [GoodsReceiptController::class, 'post'])->middleware('permission:inventory.receipt.post')->name('post');
+            Route::post('/{receipt}/void', [GoodsReceiptController::class, 'void'])->middleware('permission:inventory.receipt.void')->name('void');
+            Route::get('/{receipt}', [GoodsReceiptController::class, 'show'])->middleware('permission:inventory.receipt.view')->name('show');
+        });
+
+        Route::prefix('inventory/stock')->name('inventory.stock.')->middleware('permission:inventory.stock.view')->group(function () {
+            Route::get('/', [InventoryStockController::class, 'index'])->name('index');
+            Route::get('/movements', [InventoryStockController::class, 'movements'])->name('movements');
+            Route::get('/low', [InventoryStockController::class, 'low'])->name('low');
         });
 
         Route::prefix('receipts')->name('receipts.')->group(function () {
