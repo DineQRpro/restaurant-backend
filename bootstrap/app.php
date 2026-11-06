@@ -1,7 +1,9 @@
 <?php
 
 use App\Exceptions\BusinessConflictException;
+use App\Exceptions\PasswordChangeRequiredException;
 use App\Http\Middleware\CheckPermission;
+use App\Services\Auth\PosLoginService;
 use App\Http\Middleware\EnsureAdminWebAccess;
 use App\Http\Middleware\EnsureCounterWebAccess;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -26,19 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'counter.area' => EnsureCounterWebAccess::class,
         ]);
 
-        $middleware->redirectGuestsTo(function (Request $request) {
-            if ($request->is('counter') || $request->is('counter/*')) {
-                return route('counter.login');
-            }
-
-            return route('admin.login');
-        });
+        $middleware->redirectGuestsTo(fn () => route('login'));
 
         $middleware->redirectUsersTo(function () {
-            return match (auth()->user()?->role?->slug) {
-                'counter' => route('counter.dashboard'),
-                default => route('admin.dashboard'),
-            };
+            return app(PosLoginService::class)->dashboardUrl(auth()->user())
+                ?? route('auth.unavailable');
         });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -47,15 +41,28 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $exceptions->render(function (ValidationException $e, Request $request) {
-            if (! $request->is('api/*')) {
+            if ($e instanceof PasswordChangeRequiredException && ! $request->is('api/*') && ! $request->expectsJson()) {
+                return redirect()
+                    ->route('password.change')
+                    ->withInput($request->only('username'))
+                    ->withErrors($e->errors());
+            }
+
+            if (! $request->is('api/*') && ! $request->expectsJson()) {
                 return null;
             }
 
-            return response()->json([
+            $payload = [
                 'success' => false,
                 'message' => $e->getMessage(),
                 'errors' => $e->errors(),
-            ], $e->status);
+            ];
+
+            if ($e instanceof PasswordChangeRequiredException) {
+                $payload['code'] = PasswordChangeRequiredException::CODE;
+            }
+
+            return response()->json($payload, $e->status);
         });
 
         $exceptions->render(function (BusinessConflictException $e, Request $request) {
